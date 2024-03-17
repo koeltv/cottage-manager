@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ChoiceBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.text.Font?>
+
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.koeltv.cottagemanager.ReservationController">
+   <top>
+       <HBox alignment="CENTER_LEFT" style="-fx-background-color: d9d9d9;" BorderPane.alignment="CENTER">
+           <padding>
+               <Insets bottom="5.0" right="5.0" top="5.0" />
+           </padding>
+           <Label onMouseClicked="#onBackButtonClick" text="&lt; Cottage Manager">
+               <font>
+                   <Font name="System Bold" size="14.0" />
+               </font>
+               <padding>
+                   <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+               </padding>
+           </Label>
+         <ChoiceBox fx:id="cottageSelectionField" prefWidth="200.0">
+            <HBox.margin>
+               <Insets right="5.0" />
+            </HBox.margin>
+         </ChoiceBox>
+           <Button mnemonicParsing="false" onAction="#onExportButtonClick" text="Export" />
+           <Pane prefWidth="10.0" HBox.hgrow="ALWAYS" />
+           <Button alignment="CENTER_RIGHT" mnemonicParsing="false" onAction="#onCreationButtonClick" text="+" />
+       </HBox>
+   </top>
+   <center>
+      <TableView fx:id="tableView" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+        <columns>
+          <TableColumn fx:id="arrivalDate" prefWidth="90.0" text="Arrivée" />
+          <TableColumn fx:id="departureDate" prefWidth="90.0" text="Départ" />
+          <TableColumn fx:id="name" prefWidth="150.0" text="Nom" />
+          <TableColumn fx:id="repartition" prefWidth="90.0" text="Répartition" />
+          <TableColumn fx:id="nationality" prefWidth="75.0" text="Nationalité" />
+          <TableColumn fx:id="price" prefWidth="75.0" text="Prix" />
+          <TableColumn fx:id="note" prefWidth="75.0" text="Note" />
+          <TableColumn fx:id="code" prefWidth="75.0" text="Code" />
+          <TableColumn fx:id="comments" prefWidth="75.0" text="Commentaires" />
+          <TableColumn fx:id="actions" maxWidth="125.0" prefWidth="125.0" text="Actions" />
+        </columns>
+          <columnResizePolicy>
+              <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+          </columnResizePolicy>
+      </TableView>
+   </center>
+</BorderPane>

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+<?import javafx.geometry.Insets?>
+
+<BorderPane fx:controller="com.koeltv.cottagemanager.ClientController" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/11.0.14-internal" xmlns:fx="http://javafx.com/fxml/1">
+   <top>
+       <FlowPane prefWidth="200.0" style="-fx-background-color: d9d9d9;" BorderPane.alignment="CENTER">
+           <Label onMouseClicked="#onBackButtonClick" text="&lt; Cottage Manager">
+               <font>
+                   <Font name="System Bold" size="14.0"/>
+               </font>
+               <padding>
+                   <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
+               </padding>
+           </Label>
+       </FlowPane>
+   </top>
+   <center>
+      <TableView fx:id="tableView" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+        <columns>
+          <TableColumn fx:id="name" prefWidth="150.0" text="Nom" />
+          <TableColumn fx:id="phoneNumber" prefWidth="120.0" text="Téléphone" />
+          <TableColumn fx:id="nationality" prefWidth="75.0" text="Nationalité" />
+          <TableColumn fx:id="averageNote" prefWidth="75.0" text="Note moyenne" />
+          <TableColumn fx:id="reservationCount" prefWidth="75.0" text="Réservations" />
+          <TableColumn fx:id="comments" prefWidth="75.0" text="Commentaires" />
+          <TableColumn fx:id="actions" maxWidth="125.0" prefWidth="125.0" text="Actions" />
+        </columns>
+          <columnResizePolicy>
+              <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+          </columnResizePolicy>
+      </TableView>
+   </center>
+</BorderPane>

@@ -1,0 +1,25 @@
+package com.koeltv.cottagemanager
+
+import javafx.application.Application
+import javafx.fxml.FXMLLoader
+import javafx.scene.Scene
+import javafx.stage.Stage
+
+class HelloApplication : Application() {
+    override fun start(stage: Stage) {
+        SceneStack.setStage(stage)
+        val fxmlLoader = FXMLLoader(HelloApplication::class.java.getResource("home-view.fxml"))
+        val scene = Scene(fxmlLoader.load(), 650.0, 450.0)
+
+        stage.title = "Cottage Manager"
+
+        DatabaseManager.init()
+
+        SceneStack.openScene(scene)
+        stage.show()
+    }
+}
+
+fun main() {
+    Application.launch(HelloApplication::class.java)
+}
