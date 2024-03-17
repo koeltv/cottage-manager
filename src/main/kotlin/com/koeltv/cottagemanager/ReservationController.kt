@@ -36,7 +36,7 @@ class ReservationController : Initializable {
 
     lateinit var arrivalDate: TableColumn<ReservationView, LocalDate>
     lateinit var departureDate: TableColumn<ReservationView, LocalDate>
-    lateinit var name: TableColumn<ReservationView, String>
+    lateinit var client: TableColumn<ReservationView, String>
     lateinit var repartition: TableColumn<ReservationView, String>
     lateinit var nationality: TableColumn<ReservationView, String>
     lateinit var price: TableColumn<ReservationView, String>
@@ -62,7 +62,7 @@ class ReservationController : Initializable {
     override fun initialize(location: URL?, resources: ResourceBundle?) {
         arrivalDate.cellValueFactory = PropertyValueFactory("arrivalDate")
         departureDate.cellValueFactory = PropertyValueFactory("departureDate")
-        name.cellValueFactory = PropertyValueFactory("name")
+        client.cellValueFactory = PropertyValueFactory("client")
         repartition.cellValueFactory = PropertyValueFactory("repartition")
         nationality.cellValueFactory = PropertyValueFactory("nationality")
         price.cellValueFactory = PropertyValueFactory("price")
@@ -76,7 +76,7 @@ class ReservationController : Initializable {
         transaction {
             Cottage.all()
                 .map { it.toView() }
-                .forEach { cottageSelectionField.items.add(it.name) }
+                .forEach { cottageSelectionField.items.add(it.alias) }
         }
         fetchReservations()
         cottageSelectionField.selectionModel.selectedItemProperty().addListener { _, oldValue, newValue ->
@@ -90,11 +90,11 @@ class ReservationController : Initializable {
         }
     }
 
-    private fun fetchReservations(cottageName: String? = null) {
+    private fun fetchReservations(cottageAlias: String? = null) {
         tableView.items.clear()
         transaction {
-            val reservations = if (cottageName != null) {
-                Reservation.all().filter { it.cottage.name == cottageName }
+            val reservations = if (cottageAlias != null) {
+                Reservation.all().filter { it.cottage.alias == cottageAlias }
             } else {
                 Reservation.all()
             }
@@ -166,7 +166,7 @@ class ReservationController : Initializable {
                 PdfExporter.exportFormattedReservations(
                     file,
                     if (cottageSelectionField.value != ALL_COTTAGES) {
-                        Reservation.all().filter { it.cottage.name == cottageSelectionField.value }
+                        Reservation.all().filter { it.cottage.alias == cottageSelectionField.value }
                     } else {
                         Reservation.all()
                     }.toSortedSet { res1, res2 -> res1.arrivalDate.compareTo(res2.arrivalDate) },

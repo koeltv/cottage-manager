@@ -93,7 +93,7 @@ class ReservationEditController : Initializable {
 
         transaction {
             Cottage.all()
-                .map { it.name }
+                .map { it.alias }
                 .forEach { cottageField.items.add(it) }
         }
         cottageField.value = cottageField.items.first()
@@ -172,7 +172,7 @@ class ReservationEditController : Initializable {
                 departureDate = departureDateField.value
                 nightCount = arrivalDateField.value.until(departureDateField.value).days.toUShort()
                 reservationDate = LocalDate.now()
-                cottage = Cottage.findById(cottageField.value)!!
+                cottage = Cottage.all().first { it.alias == cottageField.value }
                 price = priceField.text.let {
                     Regex("(\\d+)([,.](\\d{0,2}))?")
                         .find(it)!!.destructured

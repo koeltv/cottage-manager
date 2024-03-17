@@ -40,7 +40,7 @@
         <columns>
           <TableColumn fx:id="arrivalDate" prefWidth="90.0" text="Arrivée" />
           <TableColumn fx:id="departureDate" prefWidth="90.0" text="Départ" />
-          <TableColumn fx:id="name" prefWidth="150.0" text="Nom" />
+          <TableColumn fx:id="client" prefWidth="150.0" text="Nom" />
           <TableColumn fx:id="repartition" prefWidth="90.0" text="Répartition" />
           <TableColumn fx:id="nationality" prefWidth="75.0" text="Nationalité" />
           <TableColumn fx:id="price" prefWidth="75.0" text="Prix" />

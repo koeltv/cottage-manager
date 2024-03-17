@@ -37,6 +37,7 @@ object Reservations: IdTable<String>() {
 
 object Cottages: IdTable<String>() {
     val name = varchar("name", 50)
+    val alias = varchar("alias", 50).uniqueIndex()
 
     override val id = name.entityId()
     override val primaryKey = PrimaryKey(name)
@@ -77,4 +78,5 @@ class Cottage(id: EntityID<String>) : Entity<String>(id) {
     companion object : EntityClass<String, Cottage>(Cottages)
 
     var name by Cottages.name
+    var alias by Cottages.alias
 }

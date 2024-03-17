@@ -24,6 +24,7 @@ class CottageController : Initializable {
     lateinit var root: BorderPane
 
     lateinit var name: TableColumn<CottageView, String>
+    lateinit var alias: TableColumn<CottageView, String>
     lateinit var actions: TableColumn<CottageView, Void>
 
     @FXML
@@ -36,6 +37,7 @@ class CottageController : Initializable {
 
     override fun initialize(location: URL?, resources: ResourceBundle?) {
         name.cellValueFactory = PropertyValueFactory("name")
+        alias.cellValueFactory = PropertyValueFactory("alias")
         setupActionColumn()
 
         tableView.items.clear()

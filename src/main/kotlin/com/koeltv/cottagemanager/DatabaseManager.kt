@@ -25,6 +25,7 @@ object DatabaseManager {
         transaction {
             Cottages.insertIgnore {
                 it[name] = reservation.cottage
+                it[alias] = reservation.cottage
             }
             Clients.insertIgnore {
                 it[name] = reservation.name

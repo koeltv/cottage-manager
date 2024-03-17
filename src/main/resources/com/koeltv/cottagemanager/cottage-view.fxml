@@ -25,6 +25,7 @@
       <TableView fx:id="tableView" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
         <columns>
           <TableColumn fx:id="name" prefWidth="200.0" text="Nom" />
+          <TableColumn fx:id="alias" prefWidth="200.0" text="Alias" />
           <TableColumn fx:id="actions" maxWidth="125.0" prefWidth="125.0" text="Actions" />
         </columns>
          <columnResizePolicy>

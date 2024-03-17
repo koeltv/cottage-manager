@@ -8,7 +8,7 @@ import java.time.LocalDate
 data class ReservationView(
     val arrivalDate: LocalDate,
     val departureDate: LocalDate,
-    val name: String,
+    val client: String,
     val repartition: String,
     val nationality: String,
     val price: String,
