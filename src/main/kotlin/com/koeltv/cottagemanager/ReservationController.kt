@@ -8,10 +8,11 @@ import javafx.fxml.FXMLLoader
 import javafx.fxml.Initializable
 import javafx.geometry.Pos
 import javafx.scene.Node
-import javafx.scene.Scene
 import javafx.scene.control.*
 import javafx.scene.control.cell.PropertyValueFactory
+import javafx.scene.layout.BorderPane
 import javafx.scene.layout.HBox
+import javafx.scene.layout.Pane
 import javafx.stage.FileChooser
 import javafx.stage.Stage
 import javafx.util.Callback
@@ -26,6 +27,9 @@ class ReservationController : Initializable {
     companion object {
         const val ALL_COTTAGES = "Tous les gîtes"
     }
+
+    @FXML
+    lateinit var root: BorderPane
 
     @FXML
     lateinit var cottageSelectionField: ChoiceBox<String>
@@ -46,13 +50,13 @@ class ReservationController : Initializable {
 
     @FXML
     private fun onBackButtonClick() {
-        SceneStack.back()
+        (root.parent as Pane).children.remove(root)
     }
 
     @FXML
     private fun onCreationButtonClick() {
         val fxmlLoader = FXMLLoader(HelloApplication::class.java.getResource("reservation-edit-view.fxml"))
-        SceneStack.openScene(Scene(fxmlLoader.load()))
+        (root.parent as Pane).children.add(fxmlLoader.load())
     }
 
     override fun initialize(location: URL?, resources: ResourceBundle?) {

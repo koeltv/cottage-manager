@@ -5,28 +5,31 @@ import javafx.event.ActionEvent
 import javafx.fxml.FXML
 import javafx.fxml.FXMLLoader
 import javafx.scene.Node
-import javafx.scene.Scene
+import javafx.scene.layout.StackPane
 import javafx.stage.FileChooser
 import javafx.stage.Stage
 import java.io.File
 
 class HomeController {
     @FXML
+    lateinit var stackPane: StackPane
+
+    @FXML
     private fun onCottageButtonClick() {
         val fxmlLoader = FXMLLoader(HelloApplication::class.java.getResource("cottage-view.fxml"))
-        SceneStack.openScene(Scene(fxmlLoader.load()))
+        stackPane.children.add(fxmlLoader.load())
     }
 
     @FXML
     private fun onReservationButtonClick() {
         val fxmlLoader = FXMLLoader(HelloApplication::class.java.getResource("reservation-view.fxml"))
-        SceneStack.openScene(Scene(fxmlLoader.load()))
+        stackPane.children.add(fxmlLoader.load())
     }
 
     @FXML
     private fun onClientButtonClick() {
         val fxmlLoader = FXMLLoader(HelloApplication::class.java.getResource("client-view.fxml"))
-        SceneStack.openScene(Scene(fxmlLoader.load()))
+        stackPane.children.add(fxmlLoader.load())
     }
 
     @FXML
@@ -47,4 +50,6 @@ class HomeController {
                 .forEach { DatabaseManager.importAirbnbReservation(it) }
         }
     }
+
+
 }

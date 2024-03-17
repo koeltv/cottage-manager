@@ -8,76 +8,79 @@
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.FlowPane?>
+<?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.koeltv.cottagemanager.HomeController">
-   <top>
-       <FlowPane prefWidth="200.0" style="-fx-background-color: d9d9d9;" BorderPane.alignment="CENTER">
-           <Label text="Cottage Manager">
-               <font>
-                   <Font name="System Bold" size="14.0" />
-               </font>
-               <padding>
-                   <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-               </padding>
-           </Label>
-         <Button mnemonicParsing="false" onAction="#onImportButtonClick" text="Import">
-            <FlowPane.margin>
-               <Insets bottom="5.0" left="5.0" top="5.0" />
-            </FlowPane.margin>
-         </Button>
-       </FlowPane>
-   </top>
-   <center>
-       <FlowPane>
-           <Button contentDisplay="TOP" mnemonicParsing="false" onAction="#onCottageButtonClick" prefHeight="200.0" prefWidth="200.0" text="Gestion Gîtes">
-               <graphic>
-                   <ImageView fitHeight="100.0" fitWidth="100.0">
-                       <Image url="@../images/round-home.png" />
-                       <viewport>
-                           <Rectangle2D />
-                       </viewport>
-                   </ImageView>
-               </graphic>
-               <FlowPane.margin>
-                   <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-               </FlowPane.margin>
-               <font>
-                   <Font name="System Bold" size="12.0" />
-               </font>
-           </Button>
-           <Button contentDisplay="TOP" mnemonicParsing="false" onAction="#onReservationButtonClick" prefHeight="200.0" prefWidth="200.0" text="Gestion Réservations">
-               <graphic>
-                   <ImageView fitHeight="100.0" fitWidth="100.0">
-                       <Image url="@../images/reservation.png" />
-                       <viewport>
-                           <Rectangle2D />
-                       </viewport>
-                   </ImageView>
-               </graphic>
-               <FlowPane.margin>
-                   <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-               </FlowPane.margin>
-               <font>
-                   <Font name="System Bold" size="12.0" />
-               </font>
-           </Button>
-         <Button contentDisplay="TOP" mnemonicParsing="false" onAction="#onClientButtonClick" prefHeight="200.0" prefWidth="200.0" text="Gestion Clients">
-             <graphic>
-                 <ImageView fitHeight="100.0" fitWidth="100.0">
-                     <Image url="@../images/client.png" />
-                  <viewport>
-                     <Rectangle2D />
-                  </viewport>
-                 </ImageView>
-             </graphic>
-            <FlowPane.margin>
-               <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-            </FlowPane.margin>
-            <font>
-               <Font name="System Bold" size="12.0" />
-            </font>
-         </Button>
-       </FlowPane>
-   </center>
-</BorderPane>
+<StackPane fx:id="stackPane" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.koeltv.cottagemanager.HomeController">
+    <BorderPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0">
+        <top>
+            <FlowPane prefWidth="200.0" style="-fx-background-color: d9d9d9;" BorderPane.alignment="CENTER">
+                <Label text="Cottage Manager">
+                    <font>
+                        <Font name="System Bold" size="14.0" />
+                    </font>
+                    <padding>
+                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                    </padding>
+                </Label>
+                <Button mnemonicParsing="false" onAction="#onImportButtonClick" text="Import">
+                    <FlowPane.margin>
+                        <Insets bottom="5.0" left="5.0" top="5.0" />
+                    </FlowPane.margin>
+                </Button>
+            </FlowPane>
+        </top>
+        <center>
+            <FlowPane>
+                <Button contentDisplay="TOP" mnemonicParsing="false" onAction="#onCottageButtonClick" prefHeight="200.0" prefWidth="200.0" text="Gestion Gîtes">
+                    <graphic>
+                        <ImageView fitHeight="100.0" fitWidth="100.0">
+                            <Image url="@../images/round-home.png" />
+                            <viewport>
+                                <Rectangle2D />
+                            </viewport>
+                        </ImageView>
+                    </graphic>
+                    <FlowPane.margin>
+                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                    </FlowPane.margin>
+                    <font>
+                        <Font name="System Bold" size="12.0" />
+                    </font>
+                </Button>
+                <Button contentDisplay="TOP" mnemonicParsing="false" onAction="#onReservationButtonClick" prefHeight="200.0" prefWidth="200.0" text="Gestion Réservations">
+                    <graphic>
+                        <ImageView fitHeight="100.0" fitWidth="100.0">
+                            <Image url="@../images/reservation.png" />
+                            <viewport>
+                                <Rectangle2D />
+                            </viewport>
+                        </ImageView>
+                    </graphic>
+                    <FlowPane.margin>
+                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                    </FlowPane.margin>
+                    <font>
+                        <Font name="System Bold" size="12.0" />
+                    </font>
+                </Button>
+                <Button contentDisplay="TOP" mnemonicParsing="false" onAction="#onClientButtonClick" prefHeight="200.0" prefWidth="200.0" text="Gestion Clients">
+                    <graphic>
+                        <ImageView fitHeight="100.0" fitWidth="100.0">
+                            <Image url="@../images/client.png" />
+                            <viewport>
+                                <Rectangle2D />
+                            </viewport>
+                        </ImageView>
+                    </graphic>
+                    <FlowPane.margin>
+                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                    </FlowPane.margin>
+                    <font>
+                        <Font name="System Bold" size="12.0" />
+                    </font>
+                </Button>
+            </FlowPane>
+        </center>
+    </BorderPane>
+</StackPane>

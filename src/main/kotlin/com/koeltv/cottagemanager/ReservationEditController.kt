@@ -7,6 +7,8 @@ import javafx.event.Event
 import javafx.fxml.FXML
 import javafx.fxml.Initializable
 import javafx.scene.control.*
+import javafx.scene.layout.Pane
+import javafx.scene.layout.VBox
 import org.jetbrains.exposed.sql.transactions.transaction
 import java.net.URL
 import java.time.LocalDate
@@ -14,6 +16,9 @@ import java.util.*
 
 
 class ReservationEditController : Initializable {
+    @FXML
+    lateinit var root: VBox
+
     @FXML
     lateinit var cottageField: ChoiceBox<String>
 
@@ -142,7 +147,7 @@ class ReservationEditController : Initializable {
 
     @FXML
     fun onCancelButtonClick() {
-        SceneStack.back()
+        (root.parent as Pane).children.remove(root)
     }
 
     @FXML
@@ -178,6 +183,6 @@ class ReservationEditController : Initializable {
             }
         }
 
-        SceneStack.back()
+        (root.parent as Pane).children.remove(root)
     }
 }

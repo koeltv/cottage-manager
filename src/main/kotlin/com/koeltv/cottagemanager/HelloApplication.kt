@@ -7,15 +7,13 @@ import javafx.stage.Stage
 
 class HelloApplication : Application() {
     override fun start(stage: Stage) {
-        SceneStack.setStage(stage)
         val fxmlLoader = FXMLLoader(HelloApplication::class.java.getResource("home-view.fxml"))
-        val scene = Scene(fxmlLoader.load(), 650.0, 450.0)
 
+        stage.scene = Scene(fxmlLoader.load(), 650.0, 450.0)
         stage.title = "Cottage Manager"
 
         DatabaseManager.init()
 
-        SceneStack.openScene(scene)
         stage.show()
     }
 }

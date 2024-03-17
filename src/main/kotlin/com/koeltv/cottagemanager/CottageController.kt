@@ -4,15 +4,15 @@ import com.koeltv.cottagemanager.data.CottageView
 import com.koeltv.cottagemanager.data.toView
 import javafx.fxml.FXML
 import javafx.fxml.Initializable
-import javafx.geometry.HPos
 import javafx.geometry.Pos
 import javafx.scene.control.Button
 import javafx.scene.control.TableCell
 import javafx.scene.control.TableColumn
 import javafx.scene.control.TableView
 import javafx.scene.control.cell.PropertyValueFactory
-import javafx.scene.layout.FlowPane
+import javafx.scene.layout.BorderPane
 import javafx.scene.layout.HBox
+import javafx.scene.layout.Pane
 import javafx.util.Callback
 import org.jetbrains.exposed.sql.transactions.transaction
 import java.net.URL
@@ -20,6 +20,9 @@ import java.util.*
 
 
 class CottageController : Initializable {
+    @FXML
+    lateinit var root: BorderPane
+
     lateinit var name: TableColumn<CottageView, String>
     lateinit var actions: TableColumn<CottageView, Void>
 
@@ -28,7 +31,7 @@ class CottageController : Initializable {
 
     @FXML
     private fun onBackButtonClick() {
-        SceneStack.back()
+        (root.parent as Pane).children.remove(root)
     }
 
     override fun initialize(location: URL?, resources: ResourceBundle?) {

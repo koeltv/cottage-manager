@@ -1,24 +1,28 @@
 package com.koeltv.cottagemanager
 
+import com.koeltv.cottagemanager.data.ClientView
 import com.koeltv.cottagemanager.data.toView
 import javafx.fxml.FXML
 import javafx.fxml.Initializable
+import javafx.geometry.Pos
 import javafx.scene.control.Button
 import javafx.scene.control.TableCell
 import javafx.scene.control.TableColumn
 import javafx.scene.control.TableView
 import javafx.scene.control.cell.PropertyValueFactory
-import javafx.scene.layout.FlowPane
+import javafx.scene.layout.BorderPane
+import javafx.scene.layout.HBox
+import javafx.scene.layout.Pane
 import javafx.util.Callback
 import org.jetbrains.exposed.sql.transactions.transaction
 import java.net.URL
 import java.util.*
 import com.koeltv.cottagemanager.Client.Companion as DatabaseClient
-import com.koeltv.cottagemanager.data.ClientView
-import javafx.geometry.Pos
-import javafx.scene.layout.HBox
 
 class ClientController: Initializable {
+    @FXML
+    lateinit var root: BorderPane
+
     lateinit var name: TableColumn<ClientView, String>
     lateinit var phoneNumber: TableColumn<ClientView, String?>
     lateinit var nationality: TableColumn<ClientView, String?>
@@ -31,7 +35,7 @@ class ClientController: Initializable {
 
     @FXML
     private fun onBackButtonClick() {
-        SceneStack.back()
+        (root.parent as Pane).children.remove(root)
     }
 
     override fun initialize(location: URL?, resources: ResourceBundle?) {
