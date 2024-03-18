@@ -3,6 +3,7 @@ package com.koeltv.cottagemanager
 import javafx.application.Application
 import javafx.fxml.FXMLLoader
 import javafx.scene.Scene
+import javafx.scene.image.Image
 import javafx.stage.Stage
 
 class HelloApplication : Application() {
@@ -11,6 +12,7 @@ class HelloApplication : Application() {
 
         stage.scene = Scene(fxmlLoader.load(), 650.0, 450.0)
         stage.title = "Cottage Manager"
+        stage.icons.add(Image("logo.png"))
 
         DatabaseManager.init()
 
