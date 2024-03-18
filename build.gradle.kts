@@ -1,13 +1,15 @@
 plugins {
     kotlin("jvm") version "1.9.22"
 
-    id("org.javamodularity.moduleplugin") version "1.8.12"
     id("org.openjfx.javafxplugin") version "0.0.13"
-    id("org.beryx.jlink") version "2.25.0"
+    id("org.beryx.runtime") version "1.13.1"
 }
 
 group = "com.koeltv"
-version = "1.0-SNAPSHOT"
+version = "1.0"
+
+val author = "koeltv"
+val vendor = "Valentin Koeltgen"
 
 val exposedVersion: String by project
 val sqliteDriverVersion: String by project
@@ -42,7 +44,6 @@ tasks.test {
 }
 
 application {
-    mainModule.set("com.koeltv.cottagemanager")
     mainClass.set("com.koeltv.cottagemanager.HelloApplicationKt")
 }
 
@@ -50,14 +51,43 @@ kotlin {
     jvmToolchain(17)
 }
 
-jlink {
+runtime {
     imageZip = project.file("${buildDir}/distributions/app-${javafx.platform.classifier}.zip")
     addOptions("--strip-debug", "--compress", "2", "--no-header-files", "--no-man-pages")
+//    modules = listOf() TODO Add modules manually
+
     launcher {
-        name = "app"
+        noConsole = true
+    }
+
+    jpackage {
+        val currentOs = org.gradle.internal.os.OperatingSystem.current()
+
+        imageName = rootProject.name
+        val imgType = if(currentOs.isWindows) "ico" else "png"
+        imageOptions = listOf(
+            "--vendor", vendor,
+            "--icon", "src/main/resources/logo.$imgType",
+//            "copyright", "",
+//            "description", ""
+            )
+
+        installerName = rootProject.name
+        val myInstallerOptions = mutableListOf<String>(
+//            "--license-file", "path/to/file"
+        )
+        if (currentOs.isWindows) {
+            myInstallerOptions += listOf("--win-per-user-install", "--win-menu", "--win-menu-group", author, "--win-shortcut")
+        } else if (currentOs.isLinux) {
+            myInstallerOptions += listOf("--linux-package-name", author, "--linux-shortcut")
+        } else if (currentOs.isMacOsX) {
+            myInstallerOptions += listOf("--mac-package-name", author)
+        }
+
+        installerOptions = myInstallerOptions
     }
 }
 
-tasks.jlinkZip.configure {
-    group = "distribution"
+tasks.register("version") {
+    doLast { println("v$version") }
 }
