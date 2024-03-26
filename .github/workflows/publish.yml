@@ -29,7 +29,6 @@ jobs:
           runner-os: ${{ matrix.os }}
 
       - name: Get current version
-        if: !startsWith(matrix.os, 'windows')
         run: echo "VERSION_INFORMATION=$(./gradlew -q version)" >> $GITHUB_ENV
 
       - name: Get current version (windows)
