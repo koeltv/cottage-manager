@@ -29,7 +29,12 @@ jobs:
           runner-os: ${{ matrix.os }}
 
       - name: Get current version
+        if: !startsWith(matrix.os, 'windows')
         run: echo "VERSION_INFORMATION=$(./gradlew -q version)" >> $GITHUB_ENV
+
+      - name: Get current version (windows)
+        if: startsWith(matrix.os, 'windows')
+        run: echo "VERSION_INFORMATION=$(./gradlew -q version)" >> $ENV:GITHUB_ENV
 
       - name: Create installer per OS
         run: ./gradlew jpackage
