@@ -1,3 +1,9 @@
+import org.gradle.internal.os.OperatingSystem
+import java.io.BufferedOutputStream
+import java.io.FileOutputStream
+import java.util.zip.ZipEntry
+import java.util.zip.ZipOutputStream
+
 plugins {
     kotlin("jvm") version "1.9.22"
 
@@ -10,9 +16,12 @@ version = "1.0"
 
 val author = "koeltv"
 val vendor = "Valentin Koeltgen"
+val projectUrl = "https://github.com/koeltv/cottage-manager"
 
 val exposedVersion: String by project
 val sqliteDriverVersion: String by project
+
+val currentOs: OperatingSystem = OperatingSystem.current()
 
 repositories {
     mavenCentral()
@@ -54,37 +63,85 @@ kotlin {
 runtime {
     imageZip = project.file("${buildDir}/distributions/app-${javafx.platform.classifier}.zip")
     addOptions("--strip-debug", "--compress", "2", "--no-header-files", "--no-man-pages")
-//    modules = listOf() TODO Add modules manually
+    modules = listOf(
+        "java.desktop",
+        "jdk.jfr",
+        "java.xml",
+        "jdk.unsupported",
+        "java.scripting",
+        "java.net.http",
+        "java.sql",
+        "java.logging",
+        "java.naming"
+    )
 
     launcher {
         noConsole = true
     }
 
     jpackage {
-        val currentOs = org.gradle.internal.os.OperatingSystem.current()
-
         imageName = rootProject.name
-        val imgType = if(currentOs.isWindows) "ico" else "png"
+        val imgType = if (currentOs.isWindows) "ico" else "png"
         imageOptions = listOf(
             "--vendor", vendor,
             "--icon", "src/main/resources/logo.$imgType",
-//            "copyright", "",
-//            "description", ""
-            )
-
-        installerName = rootProject.name
-        val myInstallerOptions = mutableListOf<String>(
-//            "--license-file", "path/to/file"
+            "--copyright", vendor,
+            "--description", "facilite la gestion de locations sur plusieurs gites simultanement"
         )
-        if (currentOs.isWindows) {
-            myInstallerOptions += listOf("--win-per-user-install", "--win-menu", "--win-menu-group", author, "--win-shortcut")
-        } else if (currentOs.isLinux) {
-            myInstallerOptions += listOf("--linux-package-name", author, "--linux-shortcut")
-        } else if (currentOs.isMacOsX) {
-            myInstallerOptions += listOf("--mac-package-name", author)
-        }
 
-        installerOptions = myInstallerOptions
+        installerName = "${rootProject.name}-installer"
+        installerOptions = mutableListOf(
+            "--license-file", "LICENSE",
+            "--about-url", projectUrl
+        ).also {
+            if (currentOs.isWindows) {
+                it += listOf(
+                    "--win-per-user-install",
+                    "--win-menu",
+                    "--win-menu-group", author,
+                    "--win-shortcut",
+                    "--win-help-url", projectUrl
+                )
+            } else if (currentOs.isLinux) {
+                it += listOf(
+                    "--linux-package-name", project.name,
+                    "--linux-shortcut"
+                )
+            } else if (currentOs.isMacOsX) {
+                it += listOf(
+                    "--mac-package-name", project.name
+                )
+            }
+        }
+    }
+}
+
+tasks.register("jpackageZip") {
+    dependsOn(tasks.jpackage)
+
+    doLast {
+        val osExtension = if (currentOs.isWindows) "win"
+        else if (currentOs.isMacOsX) "mac"
+        else "linux"
+
+        zipAll(
+            sourceFile = project.file("${buildDir}/jpackage/${project.name}"),
+            outputZipFile = project.file("${buildDir}/jpackage/${project.name}-$version-${osExtension}.zip")
+        )
+    }
+}
+
+fun zipAll(sourceFile: File, outputZipFile: File) {
+    ZipOutputStream(BufferedOutputStream(FileOutputStream(outputZipFile))).use { zipOutputStream ->
+        sourceFile.walkTopDown().forEach { file ->
+            val zipFileName =
+                file.absolutePath.removePrefix(sourceFile.absolutePath).removePrefix("/").removePrefix("\\")
+            val entry = ZipEntry("$zipFileName${if (file.isDirectory) "/" else ""}")
+            zipOutputStream.putNextEntry(entry)
+            if (file.isFile) {
+                file.inputStream().copyTo(zipOutputStream)
+            }
+        }
     }
 }
 

@@ -36,7 +36,7 @@ jobs:
         run: echo "VERSION_INFORMATION=$(./gradlew -q version)" >> $ENV:GITHUB_ENV
 
       - name: Create installer per OS
-        run: ./gradlew jpackage
+        run: ./gradlew jpackageZip
 
       - name: Update Release with artifacts
         uses: ncipollo/release-action@v1.12.0
