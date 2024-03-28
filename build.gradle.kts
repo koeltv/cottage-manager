@@ -1,6 +1,7 @@
 import org.gradle.internal.os.OperatingSystem
 import java.io.BufferedOutputStream
 import java.io.FileOutputStream
+import java.nio.file.FileSystems
 import java.util.zip.ZipEntry
 import java.util.zip.ZipOutputStream
 
@@ -12,7 +13,7 @@ plugins {
 }
 
 group = "com.koeltv"
-version = "1.0"
+version = "2.0"
 
 val author = "koeltv"
 val vendor = "Valentin Koeltgen"
@@ -72,7 +73,8 @@ runtime {
         "java.net.http",
         "java.sql",
         "java.logging",
-        "java.naming"
+        "java.naming",
+        "jdk.crypto.ec",
     )
 
     launcher {
@@ -114,6 +116,28 @@ runtime {
             }
         }
     }
+}
+
+tasks.register("bundleUpdater") {
+    dependsOn(tasks.jpackageImage)
+    dependsOn(":updater:shadowJar")
+
+    doLast {
+        val updaterLibDirectory = project.file("${projectDir}/updater/build/libs")
+        updaterLibDirectory.absoluteFile.list()
+            ?.first { "all.jar" in it }
+            ?.let {
+                val updaterJarFile = File("$updaterLibDirectory${FileSystems.getDefault().separator}$it")
+                updaterJarFile.copyTo(
+                    project.file("${buildDir}/jpackage/${project.name}/app/${updaterJarFile.name}"),
+                    overwrite = true
+                )
+            }
+    }
+}
+
+tasks.jpackage {
+    dependsOn("bundleUpdater")
 }
 
 tasks.register("jpackageZip") {

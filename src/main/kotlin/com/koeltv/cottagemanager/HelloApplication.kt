@@ -5,6 +5,7 @@ import javafx.fxml.FXMLLoader
 import javafx.scene.Scene
 import javafx.scene.image.Image
 import javafx.stage.Stage
+import kotlin.concurrent.thread
 
 class HelloApplication : Application() {
     override fun start(stage: Stage) {
@@ -21,5 +22,6 @@ class HelloApplication : Application() {
 }
 
 fun main() {
+    thread { Updater.setup() }
     Application.launch(HelloApplication::class.java)
 }
