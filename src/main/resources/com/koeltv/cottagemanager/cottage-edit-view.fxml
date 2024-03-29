@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox fx:id="root" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="400.0" prefWidth="675.0" style="-fx-background-color: e8e8e8;" xmlns="http://javafx.com/javafx/11.0.14-internal" xmlns:fx="http://javafx.com/fxml/1">
+   <padding>
+      <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+   </padding>
+   <FlowPane alignment="CENTER_LEFT" layoutX="10.0" layoutY="277.0" prefHeight="200.0" prefWidth="200.0">
+      <Label text="Nom :">
+         <FlowPane.margin>
+            <Insets right="5.0" />
+         </FlowPane.margin></Label>
+      <TextField fx:id="nameField" prefWidth="300.0" promptText="Maison paisible dans la campagne" />
+   </FlowPane>
+   <FlowPane alignment="CENTER_LEFT" layoutX="15.0" layoutY="15.0" prefHeight="200.0" prefWidth="200.0">
+      <Label text="Alias :">
+         <FlowPane.margin>
+            <Insets right="5.0"/>
+         </FlowPane.margin>
+      </Label>
+      <TextField fx:id="aliasField" prefWidth="300.0" promptText="Chez X &amp; Y"/>
+   </FlowPane>
+   <FlowPane alignment="CENTER_RIGHT" prefHeight="200.0" prefWidth="200.0">
+      <Button mnemonicParsing="false" onAction="#onCancelButtonClick" text="Retour" />
+      <Button fx:id="addButton" defaultButton="true" disable="true" mnemonicParsing="false" onAction="#onConfirmButtonClick" text="Ajouter" />
+   </FlowPane>
+</VBox>

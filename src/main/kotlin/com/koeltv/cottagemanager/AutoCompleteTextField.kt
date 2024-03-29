@@ -141,12 +141,14 @@ class AutoCompleteTextField<S>(entrySet: SortedSet<S> = TreeSet()) : TextField()
                     if (!isPopupHidden) {
                         populatePopup(searchResult, text1)
                         if (!entryMenu.isShowing) {
-                            entryMenu.show(
-                                this@AutoCompleteTextField,
-                                Side.BOTTOM,
-                                0.0,
-                                0.0
-                            )
+                            try {
+                                entryMenu.show(
+                                    this@AutoCompleteTextField,
+                                    Side.BOTTOM,
+                                    0.0,
+                                    0.0
+                                )
+                            } catch (_: NullPointerException) {}
                         }
                     }
                 } else {

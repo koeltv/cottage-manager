@@ -3,6 +3,7 @@ package com.koeltv.cottagemanager
 import com.koeltv.cottagemanager.data.ClientView
 import com.koeltv.cottagemanager.data.toView
 import javafx.fxml.FXML
+import javafx.fxml.FXMLLoader
 import javafx.fxml.Initializable
 import javafx.geometry.Pos
 import javafx.scene.control.Button
@@ -61,10 +62,15 @@ class ClientController: Initializable {
                 private val panel = HBox(5.0).apply {
                     alignment = Pos.CENTER
                     children.add(
-                        Button("Edit").also {
+                        Button("Éditer").also {
                             it.setOnAction {
                                 val data = tableView.items[index]
                                 println("toEdit: $data")
+
+                                val fxmlLoader =
+                                    FXMLLoader(HelloApplication::class.java.getResource("client-edit-view.fxml"))
+                                fxmlLoader.setController(ClientUpdateController(data.name))
+                                (root.parent as Pane).children.add(fxmlLoader.load())
                             }
                         }
                     )

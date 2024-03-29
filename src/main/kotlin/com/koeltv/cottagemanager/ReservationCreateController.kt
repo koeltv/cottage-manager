@@ -15,7 +15,7 @@ import java.time.LocalDate
 import java.util.*
 
 
-class ReservationEditController : Initializable {
+open class ReservationCreateController : Initializable {
     @FXML
     lateinit var root: VBox
 
@@ -61,7 +61,7 @@ class ReservationEditController : Initializable {
     @FXML
     lateinit var addButton: Button
 
-    private val fieldValidityMap: ObservableMap<Control, Boolean> = FXCollections.observableHashMap()
+    internal val fieldValidityMap: ObservableMap<Control, Boolean> = FXCollections.observableHashMap()
 
     override fun initialize(location: URL?, resources: ResourceBundle?) {
         fieldValidityMap.putAll(
@@ -151,7 +151,7 @@ class ReservationEditController : Initializable {
     }
 
     @FXML
-    private fun onConfirmButtonClick() {
+    open fun onConfirmButtonClick() {
         val clientName = nameField.text
 
         transaction {
@@ -166,8 +166,8 @@ class ReservationEditController : Initializable {
                 status = if (arrivalDateField.value < LocalDate.now()) "Ancien voyageur" else "Confirmée"
                 client = knownClient
                 adultCount = adultCountField.text.toUByte()
-                childCount = childCountField.text.toUByte()
-                babyCount = babyCountField.text.toUByte()
+                childCount = childCountField.text.toUByteOrNull() ?: 0U
+                babyCount = babyCountField.text.toUByteOrNull() ?: 0U
                 arrivalDate = arrivalDateField.value
                 departureDate = departureDateField.value
                 nightCount = arrivalDateField.value.until(departureDateField.value).days.toUShort()

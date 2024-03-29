@@ -56,6 +56,7 @@ class ReservationController : Initializable {
     @FXML
     private fun onCreationButtonClick() {
         val fxmlLoader = FXMLLoader(HelloApplication::class.java.getResource("reservation-edit-view.fxml"))
+        fxmlLoader.setController(ReservationCreateController())
         (root.parent as Pane).children.add(fxmlLoader.load())
     }
 
@@ -111,16 +112,41 @@ class ReservationController : Initializable {
                 private val panel = HBox(5.0).apply {
                     alignment = Pos.CENTER
                     children.addAll(
-                        Button("Edit").also {
+                        Button("Éditer").also {
                             it.setOnAction {
                                 val data: ReservationView = tableView.items[index]
                                 println("toEdit: $data")
+
+                                val fxmlLoader =
+                                    FXMLLoader(HelloApplication::class.java.getResource("reservation-edit-view.fxml"))
+                                fxmlLoader.setController(ReservationUpdateController(data.code))
+                                (root.parent as Pane).children.add(fxmlLoader.load())
+
                             }
                         },
-                        Button("Delete").also {
+                        Button("Supprimer").also {
                             it.setOnAction {
                                 val data: ReservationView = tableView.items[index]
                                 println("toDelete: $data")
+
+                                val alert = Alert(Alert.AlertType.CONFIRMATION).apply {
+                                    title = "Suppression de la réservation"
+                                    headerText = "Voulez-vous vraiment supprimer cette réservation ?"
+                                }
+
+                                val result = alert.showAndWait()
+                                if (result.get() == ButtonType.OK) {
+                                    transaction {
+                                        val reservation = Reservation.findById(data.code)!!
+                                        val client = reservation.client
+
+                                        reservation.delete()
+
+                                        if (Reservation.find { Reservations.client eq client.id }.count() <= 0) {
+                                            client.delete()
+                                        }
+                                    }
+                                }
                             }
                         }
                     )
