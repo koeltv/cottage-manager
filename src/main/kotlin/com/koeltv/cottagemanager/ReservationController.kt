@@ -16,6 +16,9 @@ import javafx.scene.layout.Pane
 import javafx.stage.FileChooser
 import javafx.stage.Stage
 import javafx.util.Callback
+import org.jetbrains.exposed.dao.EntityChangeType
+import org.jetbrains.exposed.dao.EntityHook
+import org.jetbrains.exposed.dao.alertSubscribers
 import org.jetbrains.exposed.sql.transactions.transaction
 import java.io.File
 import java.net.URL
@@ -87,6 +90,28 @@ class ReservationController : Initializable {
                 } else {
                     fetchReservations(newValue)
                 }
+            }
+        }
+
+        tableView.sortOrder.add(arrivalDate)
+
+        EntityHook.subscribe { change ->
+            if (change.entityClass == Reservation) {
+                when(change.changeType) {
+                    EntityChangeType.Created -> {
+                        val newView = Reservation.findById(change.entityId.value as String)!!.toView()
+                        tableView.items.add(newView)
+                    }
+                    EntityChangeType.Updated -> {
+                        val updatedView = Reservation.findById(change.entityId.value as String)!!.toView()
+                        tableView.items.removeIf { it.code == updatedView.code }
+                        tableView.items.add(updatedView)
+                    }
+                    EntityChangeType.Removed -> {
+                        tableView.items.removeIf { it.code == change.entityId.value }
+                    }
+                }
+                tableView.sort()
             }
         }
     }

@@ -15,6 +15,8 @@ import javafx.scene.layout.BorderPane
 import javafx.scene.layout.HBox
 import javafx.scene.layout.Pane
 import javafx.util.Callback
+import org.jetbrains.exposed.dao.EntityChangeType
+import org.jetbrains.exposed.dao.EntityHook
 import org.jetbrains.exposed.sql.transactions.transaction
 import java.net.URL
 import java.util.*
@@ -53,6 +55,28 @@ class ClientController: Initializable {
             DatabaseClient.all()
                 .map { it.toView() }
                 .forEach { tableView.items.add(it) }
+        }
+
+        tableView.sortOrder.add(name)
+
+        EntityHook.subscribe { change ->
+            if (change.entityClass == Client) {
+                when(change.changeType) {
+                    EntityChangeType.Created -> {
+                        val newView = Client.findById(change.entityId.value as String)!!.toView()
+                        tableView.items.add(newView)
+                    }
+                    EntityChangeType.Updated -> {
+                        val updatedView = Client.findById(change.entityId.value as String)!!.toView()
+                        tableView.items.removeIf { it.name == updatedView.name }
+                        tableView.items.add(updatedView)
+                    }
+                    EntityChangeType.Removed -> {
+                        tableView.items.removeIf { it.name == change.entityId.value }
+                    }
+                }
+                tableView.sort()
+            }
         }
     }
 
