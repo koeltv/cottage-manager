@@ -12,7 +12,7 @@ class HelloApplication : Application() {
         val fxmlLoader = FXMLLoader(HelloApplication::class.java.getResource("home-view.fxml"))
 
         stage.scene = Scene(fxmlLoader.load(), 650.0, 450.0)
-        stage.title = "Cottage Manager"
+        stage.title = "Cottage Manager ${System.getProperty("jpackage.app-version")}"
         stage.icons.add(Image("logo.png"))
 
         DatabaseManager.init()
