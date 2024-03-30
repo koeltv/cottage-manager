@@ -20,7 +20,6 @@ import org.controlsfx.glyphfont.FontAwesome
 import org.controlsfx.glyphfont.Glyph
 import org.jetbrains.exposed.dao.EntityChangeType
 import org.jetbrains.exposed.dao.EntityHook
-import org.jetbrains.exposed.dao.alertSubscribers
 import org.jetbrains.exposed.sql.transactions.transaction
 import java.io.File
 import java.net.URL
