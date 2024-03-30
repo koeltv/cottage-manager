@@ -16,6 +16,8 @@ import javafx.scene.layout.Pane
 import javafx.stage.FileChooser
 import javafx.stage.Stage
 import javafx.util.Callback
+import org.controlsfx.glyphfont.FontAwesome
+import org.controlsfx.glyphfont.Glyph
 import org.jetbrains.exposed.dao.EntityChangeType
 import org.jetbrains.exposed.dao.EntityHook
 import org.jetbrains.exposed.dao.alertSubscribers
@@ -137,7 +139,7 @@ class ReservationController : Initializable {
                 private val panel = HBox(5.0).apply {
                     alignment = Pos.CENTER
                     children.addAll(
-                        Button("Éditer").also {
+                        Button("", Glyph("FontAwesome", FontAwesome.Glyph.EDIT)).also {
                             it.setOnAction {
                                 val data: ReservationView = tableView.items[index]
                                 println("toEdit: $data")
@@ -149,7 +151,7 @@ class ReservationController : Initializable {
 
                             }
                         },
-                        Button("Supprimer").also {
+                        Button("", Glyph("FontAwesome", FontAwesome.Glyph.TRASH)).also {
                             it.setOnAction {
                                 val data: ReservationView = tableView.items[index]
                                 println("toDelete: $data")

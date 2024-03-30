@@ -40,6 +40,8 @@ dependencies {
     implementation("org.jetbrains.exposed:exposed-jdbc:$exposedVersion")
     implementation("org.jetbrains.exposed:exposed-java-time:$exposedVersion")
 
+    implementation("org.controlsfx:controlsfx:11.2.1")
+
     implementation("org.xerial:sqlite-jdbc:${sqliteDriverVersion}")
 
     implementation("ch.qos.logback:logback-classic:1.5.3")

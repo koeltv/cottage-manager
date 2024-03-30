@@ -15,6 +15,8 @@ import javafx.scene.layout.BorderPane
 import javafx.scene.layout.HBox
 import javafx.scene.layout.Pane
 import javafx.util.Callback
+import org.controlsfx.glyphfont.FontAwesome
+import org.controlsfx.glyphfont.Glyph
 import org.jetbrains.exposed.dao.EntityChangeType
 import org.jetbrains.exposed.dao.EntityHook
 import org.jetbrains.exposed.sql.transactions.transaction
@@ -86,7 +88,7 @@ class ClientController: Initializable {
                 private val panel = HBox(5.0).apply {
                     alignment = Pos.CENTER
                     children.add(
-                        Button("Éditer").also {
+                        Button("", Glyph("FontAwesome", FontAwesome.Glyph.EDIT)).also {
                             it.setOnAction {
                                 val data = tableView.items[index]
                                 println("toEdit: $data")
