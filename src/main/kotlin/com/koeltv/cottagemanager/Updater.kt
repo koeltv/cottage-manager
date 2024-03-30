@@ -20,7 +20,7 @@ object Updater {
         }
 
         val latestVersion = getLatestVersion() ?: return
-        if (latestVersion.newerThan("v$version")) {
+        if (latestVersion newerThan "v$version") {
             val appDirectory = File("app")
             val updaterFile = appDirectory.list()?.find { "updater" in it }
 

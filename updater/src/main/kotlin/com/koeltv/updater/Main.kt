@@ -7,13 +7,37 @@ import java.time.LocalDateTime
 import java.time.temporal.ChronoUnit
 import java.util.zip.ZipInputStream
 
-fun main() {
-    val zipPath = File("").absoluteFile.list()?.find { it.contains(".zip") }
+const val MAX_RETRIES: Int = 5
+const val RETRY_DELAY: Long = 1000
 
-    if (zipPath == null) {
+val ignoredFileNames = listOf(
+    "app/updater",
+    "cottage-manager.exe",
+    "runtime/bin/java.dll",
+    "runtime/bin/java.exe",
+    "runtime/bin/jimage.dll",
+    "runtime/bin/jli.dll",
+    "runtime/bin/msvcp140.dll",
+    "runtime/bin/net.dll",
+    "runtime/bin/nio.dll",
+    "runtime/bin/server/jvm.dll",
+    "runtime/bin/vcruntime",
+    "runtime/bin/zip.dll",
+    "runtime/lib/modules",
+).map {
+    it
+        .replace('/', File.separatorChar)
+        .replace('\\', File.separatorChar)
+}
+
+fun main() {
+    val currentFile = File("").absoluteFile
+    val updateZipPath = currentFile.list()?.find { it.contains(".zip") }
+
+    if (updateZipPath == null) {
         println("No update archive, skipping updating process")
     } else {
-        val zipFile = File(zipPath)
+        val zipFile = File(updateZipPath)
 
         val directory = unzipFile(zipFile)
         zipFile.deleteRecursively()
@@ -61,17 +85,31 @@ fun copyDirectory(sourceDirectory: File, targetDirectory: File) {
         }
 
         override fun visitFile(file: Path, attrs: BasicFileAttributes): FileVisitResult {
-            try {
-                Files.copy(
-                    file,
-                    targetDirectoryPath.resolve(sourceDirectoryPath.relativize(file)),
-                    StandardCopyOption.REPLACE_EXISTING
-                )
-            } catch (e: FileSystemException) {
-                updateLogFile.appendText("Skipped file: $file\n")
-                return FileVisitResult.CONTINUE
+            repeat(MAX_RETRIES) { retries ->
+                try {
+                    Files.copy(
+                        file,
+                        targetDirectoryPath.resolve(sourceDirectoryPath.relativize(file)),
+                        StandardCopyOption.REPLACE_EXISTING
+                    )
+                    return FileVisitResult.CONTINUE
+                } catch (_: FileSystemException) {
+                    if (file.shouldBeSkipped()) {
+                        updateLogFile.appendText("Skipped file: $file\n")
+                        return FileVisitResult.CONTINUE
+                    }
+                    if (retries >= MAX_RETRIES - 1) {
+                        updateLogFile.appendText("Skipped file after $MAX_RETRIES attempts: $file\n")
+                        return FileVisitResult.CONTINUE
+                    }
+                    Thread.sleep(RETRY_DELAY)
+                }
             }
             return FileVisitResult.CONTINUE
         }
     })
 }
+
+private fun Path.shouldBeSkipped(): Boolean = this.matchAny(ignoredFileNames)
+
+private fun Path.matchAny(strings: List<String>) = strings.any { this.toString().contains(it) }
