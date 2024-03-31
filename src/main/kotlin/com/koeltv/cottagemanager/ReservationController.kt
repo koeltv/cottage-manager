@@ -48,7 +48,7 @@ class ReservationController : Initializable {
     lateinit var note: TableColumn<ReservationView, String>
     lateinit var code: TableColumn<ReservationView, String>
     lateinit var comments: TableColumn<ReservationView, String>
-    lateinit var actions: TableColumn<ReservationView, Void>
+    lateinit var actions: TableColumn<ReservationView, Unit>
 
     @FXML
     lateinit var tableView: TableView<ReservationView>
@@ -95,6 +95,7 @@ class ReservationController : Initializable {
             }
         }
 
+        arrivalDate.sortType = TableColumn.SortType.DESCENDING
         tableView.sortOrder.add(arrivalDate)
 
         EntityHook.subscribe { change ->
@@ -128,14 +129,14 @@ class ReservationController : Initializable {
             }
             reservations
                 .map { it.toView() }
-                .sortedBy { it.arrivalDate }
                 .forEach { tableView.items.add(it) }
         }
+        tableView.sort()
     }
 
     private fun setupActionColumn() {
-        actions.cellFactory = Callback<TableColumn<ReservationView, Void?>, TableCell<ReservationView, Void?>> {
-            object : TableCell<ReservationView, Void?>() {
+        actions.cellFactory = Callback<TableColumn<ReservationView, Unit?>, TableCell<ReservationView, Unit?>> {
+            object : TableCell<ReservationView, Unit?>() {
                 private val panel = HBox(5.0).apply {
                     alignment = Pos.CENTER
                     children.addAll(
@@ -179,7 +180,7 @@ class ReservationController : Initializable {
                     )
                 }
 
-                override fun updateItem(item: Void?, empty: Boolean) {
+                override fun updateItem(item: Unit?, empty: Boolean) {
                     super.updateItem(item, empty)
                     graphic = if (empty) null else panel
                 }

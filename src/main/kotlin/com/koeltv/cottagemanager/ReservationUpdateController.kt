@@ -68,6 +68,6 @@ class ReservationUpdateController(private val reservationId: String) : Reservati
             }
         }
 
-        (root.parent as Pane).children.remove(root) // TODO Update table on return
+        (root.parent as Pane).children.remove(root)
     }
 }

@@ -1,6 +1,7 @@
 package com.koeltv.cottagemanager
 
 import com.koeltv.cottagemanager.data.AirbnbReservation
+import com.koeltv.cottagemanager.data.AirbnbReservation.Status
 import javafx.event.ActionEvent
 import javafx.fxml.FXML
 import javafx.fxml.FXMLLoader
@@ -47,6 +48,7 @@ class HomeController {
 
         for (file in files) {
             AirbnbReservation.fromCsv(file.inputStream())
+                .filter { !Status.CANCELED.match(it.status) }
                 .forEach { DatabaseManager.importAirbnbReservation(it) }
         }
     }

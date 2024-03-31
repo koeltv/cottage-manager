@@ -39,6 +39,7 @@ object PdfExporter {
                 for (reservation in reservations) {
                     if (reservation.arrivalDate.year > currentYear) {
                         addYearSumUp(reservations, currentYear)
+                        add(Paragraph("\n"))
                         currentYear = reservation.arrivalDate.year
                     }
                     addFormattedReservation(pageSize.width, reservation, censored)
@@ -99,7 +100,7 @@ object PdfExporter {
         table.keepTogether = true
 
         // Line 0 - Month and Year with no border
-        val formattedMonth = reservation.arrivalDate.month.getDisplayName(TextStyle.FULL_STANDALONE, Locale.FRENCH)
+        val formattedMonth = reservation.arrivalDate.month.getDisplayName(TextStyle.FULL_STANDALONE, Locale.FRANCE)
         table.addCell(
             PdfPCell(
                 Paragraph("${formattedMonth.uppercaseFirst()} ${reservation.arrivalDate.year}\n")
