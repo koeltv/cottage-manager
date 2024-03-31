@@ -8,7 +8,7 @@ import org.jetbrains.exposed.sql.javatime.date
 
 object Clients: IdTable<String>() {
     val name = varchar("name", 40)
-    val phoneNumber = char("phoneNumber", 13).nullable()
+    val phoneNumber = char("phoneNumber", 14).nullable()
     val nationality = char("nationality", 2).nullable()
 
     override val id = name.entityId()

@@ -27,9 +27,12 @@ object DatabaseManager {
                 it[name] = reservation.cottage
                 it[alias] = reservation.cottage
             }
-            Clients.insertIgnore {
-                it[name] = reservation.name
-                it[phoneNumber] = reservation.phoneNumber
+            Client.findById(reservation.name)?.let {
+                if (reservation.phoneNumber.isNotBlank()) {
+                    it.phoneNumber = reservation.phoneNumber
+                }
+            } ?: Client.new(reservation.name) {
+                phoneNumber = reservation.phoneNumber
             }
             Reservations.insertIgnore {
                 it[confirmationCode] = reservation.confirmationCode

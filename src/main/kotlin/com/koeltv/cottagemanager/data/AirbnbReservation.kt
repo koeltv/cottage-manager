@@ -19,6 +19,17 @@ data class AirbnbReservation(
     val cottage: String,
     val price: Int, // 123.45€ --> 12345
 ) {
+    enum class Status(val text: String) {
+        FORMER_TRAVELER("Ancien voyageur"),
+        CANCELED("Annulée par le voyageur"),
+        CONFIRMED("Confirmée"),
+        ONGOING("Séjour en cours");
+
+        fun match(status: String): Boolean {
+            return text == status
+        }
+    }
+
     companion object {
         private val dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
 
