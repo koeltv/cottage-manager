@@ -4,7 +4,6 @@ import com.lowagie.text.*
 import com.lowagie.text.pdf.PdfPCell
 import com.lowagie.text.pdf.PdfPTable
 import com.lowagie.text.pdf.PdfWriter
-import java.awt.Color
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
@@ -16,11 +15,13 @@ import java.util.*
  * A very simple PdfPTable example.
  */
 object PdfExporter {
+    private val boldFont: Font = FontFactory.getFont(FontFactory.HELVETICA_BOLD)
+
     fun exportFormattedReservations(
         outputFile: File,
         reservations: SortedSet<Reservation>,
         censored: Boolean = false
-    ) { // TODO Split when changing year
+    ) {
         println("Exporting to $outputFile...")
 
         val document = Document()
@@ -31,19 +32,19 @@ object PdfExporter {
             document.run {
                 open()
 
-                val width = pageSize.width
+                addTitle(reservations)
 
-                reservations.forEach { addFormattedReservation(width, it, censored) }
+                var currentYear = reservations.first().arrivalDate.year
 
-//                add(Paragraph())
-                val boldFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD)
+                for (reservation in reservations) {
+                    if (reservation.arrivalDate.year > currentYear) {
+                        addYearSumUp(reservations, currentYear)
+                        currentYear = reservation.arrivalDate.year
+                    }
+                    addFormattedReservation(pageSize.width, reservation, censored)
+                }
 
-                add(
-                    Paragraph(
-                        "${reservations.size} locations = ${reservations.sumOf { it.price }.toPriceString()}",
-                        boldFont
-                    )
-                )
+                addYearSumUp(reservations, currentYear)
             }
 
             println("Export success !")
@@ -56,6 +57,36 @@ object PdfExporter {
         document.close()
     }
 
+    private fun Document.addTitle(reservations: Collection<Reservation>) {
+        val cottageAliases = reservations.map { it.cottage.alias }.distinct()
+        val title = if (cottageAliases.size == 1) {
+            cottageAliases.first()
+        } else {
+            "Tous les gîtes"
+        }
+
+        add(Paragraph(title).apply {
+            alignment = Element.ALIGN_CENTER
+            font.size += 25
+        })
+        add(Paragraph("\n"))
+    }
+
+    private fun Document.addYearSumUp(
+        reservations: Collection<Reservation>,
+        currentYear: Int
+    ) {
+        val yearlyReservations = reservations.filter { it.arrivalDate.year == currentYear }
+        add(
+            Paragraph(
+                "$currentYear = ${yearlyReservations.size} locations = ${
+                    yearlyReservations.sumOf { it.price }.toPriceString()
+                }",
+                boldFont
+            )
+        )
+    }
+
     private fun Document.addFormattedReservation(
         width: Float,
         reservation: Reservation,
@@ -65,6 +96,7 @@ object PdfExporter {
         table.horizontalAlignment = 0
         table.totalWidth = width - 72
         table.isLockedWidth = true
+        table.keepTogether = true
 
         // Line 0 - Month and Year with no border
         val formattedMonth = reservation.arrivalDate.month.getDisplayName(TextStyle.FULL_STANDALONE, Locale.FRENCH)
