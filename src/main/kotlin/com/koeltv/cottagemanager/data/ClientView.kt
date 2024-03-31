@@ -15,16 +15,17 @@ data class ClientView(
 )
 
 fun Client.toView(): ClientView {
-    val notes = Reservation
-        .find { Reservations.client eq (this@toView).id }
-        .mapNotNull { it.note?.toInt() }
+    val reservations = Reservation.find { Reservations.client eq (this@toView).id }.toList()
+
+    val notes = reservations.mapNotNull { it.note?.toInt() }
+    val averageNote = if (notes.isEmpty()) "" else notes.average().toInt().toUByte().toPlusNote()
 
     return ClientView(
         name = name,
         phoneNumber = phoneNumber ?: "",
         nationality = nationality ?: "",
-        averageNote = notes.average().toInt().toUByte().toPlusNote(),
-        reservationCount = notes.count(),
+        averageNote = averageNote,
+        reservationCount = reservations.count(),
         comments = ""
     )
 }
