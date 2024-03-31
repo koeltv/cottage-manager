@@ -25,6 +25,7 @@ import java.io.File
 import java.net.URL
 import java.time.LocalDate
 import java.util.*
+import kotlin.jvm.optionals.getOrNull
 
 
 class ReservationController : Initializable {
@@ -198,8 +199,11 @@ class ReservationController : Initializable {
         val showButton = ButtonType("Ajouter")
         alert.buttonTypes.setAll(censoredButton, showButton)
 
+        val alertWindow = alert.dialogPane.scene.window
+        alertWindow.setOnCloseRequest { _ -> alert.close() }
+
         val result = alert.showAndWait()
-        val censorReservations = result.get() != showButton
+        val answer = result.getOrNull() ?: return
 
         val fileChooser = FileChooser().apply {
             title = "Save reservation file"
@@ -222,7 +226,7 @@ class ReservationController : Initializable {
                     } else {
                         Reservation.all()
                     }.toSortedSet { res1, res2 -> res1.arrivalDate.compareTo(res2.arrivalDate) },
-                    censorReservations
+                    censored = answer != showButton
                 )
             }
         }
