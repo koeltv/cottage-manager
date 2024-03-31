@@ -13,7 +13,7 @@ plugins {
 }
 
 group = "com.koeltv"
-version = "2.2"
+version = "2.3"
 
 val author = "koeltv"
 val vendor = "Valentin Koeltgen"
