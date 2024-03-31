@@ -115,7 +115,7 @@ class AutoCompleteTextField<S>(entrySet: SortedSet<S> = TreeSet()) : TextField()
         entryMenu = ContextMenu()
 
         textProperty().addListener { _: ObservableValue<out String?>?, _: String?, _: String? ->
-            if (text == null || text.isEmpty()) {
+            if (text.isNullOrEmpty()) {
                 filteredEntries.clear()
                 filteredEntries.addAll(entries)
                 entryMenu.hide()
@@ -134,7 +134,7 @@ class AutoCompleteTextField<S>(entrySet: SortedSet<S> = TreeSet()) : TextField()
                         searchResult.add(entry)
                     }
                 }
-                if (!entries.isEmpty()) {
+                if (entries.isNotEmpty()) {
                     filteredEntries.clear()
                     filteredEntries.addAll(searchResult)
                     //Only show popup if not in filter mode
@@ -148,7 +148,9 @@ class AutoCompleteTextField<S>(entrySet: SortedSet<S> = TreeSet()) : TextField()
                                     0.0,
                                     0.0
                                 )
-                            } catch (_: NullPointerException) {}
+                            } catch (_: NullPointerException) {
+                                // Happens when the field text is modified while it isn't shown
+                            }
                         }
                     }
                 } else {

@@ -21,6 +21,9 @@ val projectUrl = "https://github.com/koeltv/cottage-manager"
 
 val exposedVersion: String by project
 val sqliteDriverVersion: String by project
+val controlFxVersion: String by project
+val logbackVersion: String by project
+val openpdfVersion: String by project
 
 val currentOs: OperatingSystem = OperatingSystem.current()
 
@@ -40,13 +43,13 @@ dependencies {
     implementation("org.jetbrains.exposed:exposed-jdbc:$exposedVersion")
     implementation("org.jetbrains.exposed:exposed-java-time:$exposedVersion")
 
-    implementation("org.controlsfx:controlsfx:11.2.1")
+    implementation("org.controlsfx:controlsfx:$controlFxVersion")
 
     implementation("org.xerial:sqlite-jdbc:${sqliteDriverVersion}")
 
-    implementation("ch.qos.logback:logback-classic:1.5.3")
+    implementation("ch.qos.logback:logback-classic:$logbackVersion")
 
-    implementation("com.github.librepdf:openpdf:2.0.0")
+    implementation("com.github.librepdf:openpdf:$openpdfVersion")
 
     testImplementation("org.jetbrains.kotlin:kotlin-test")
 }
@@ -121,6 +124,9 @@ runtime {
 }
 
 tasks.register("bundleUpdater") {
+    description = "Bundle the updater jar into the jpackage image"
+    group = JavaBasePlugin.BUILD_TASK_NAME
+
     dependsOn(tasks.jpackageImage)
     dependsOn(":updater:shadowJar")
 
@@ -143,6 +149,9 @@ tasks.jpackage {
 }
 
 tasks.register("jpackageZip") {
+    description = "Create a .zip archive from the jpackage image"
+    group = JavaBasePlugin.BUILD_TASK_NAME
+
     dependsOn(tasks.jpackage)
 
     doLast {
@@ -172,5 +181,8 @@ fun zipAll(sourceFile: File, outputZipFile: File) {
 }
 
 tasks.register("version") {
+    description = "Return the current version of the project"
+    group = JavaBasePlugin.DOCUMENTATION_GROUP
+
     doLast { println("v$version") }
 }

@@ -34,7 +34,7 @@ class ClientController: Initializable {
     lateinit var averageNote: TableColumn<ClientView, String>
     lateinit var reservationCount: TableColumn<ClientView, Int>
     lateinit var comments: TableColumn<ClientView, String>
-    lateinit var actions: TableColumn<ClientView, Void>
+    lateinit var actions: TableColumn<ClientView, Unit>
 
     lateinit var tableView: TableView<ClientView>
 
@@ -83,8 +83,8 @@ class ClientController: Initializable {
     }
 
     private fun setupActionColumn() {
-        actions.cellFactory = Callback<TableColumn<ClientView, Void?>, TableCell<ClientView, Void?>> {
-            object : TableCell<ClientView, Void?>() {
+        actions.cellFactory = Callback<TableColumn<ClientView, Unit?>, TableCell<ClientView, Unit?>> {
+            object : TableCell<ClientView, Unit?>() {
                 private val panel = HBox(5.0).apply {
                     alignment = Pos.CENTER
                     children.add(
@@ -102,7 +102,7 @@ class ClientController: Initializable {
                     )
                 }
 
-                override fun updateItem(item: Void?, empty: Boolean) {
+                override fun updateItem(item: Unit?, empty: Boolean) {
                     super.updateItem(item, empty)
                     graphic = if (empty) null else panel
                 }

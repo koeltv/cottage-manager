@@ -30,7 +30,7 @@ class CottageController : Initializable {
 
     lateinit var name: TableColumn<CottageView, String>
     lateinit var alias: TableColumn<CottageView, String>
-    lateinit var actions: TableColumn<CottageView, Void>
+    lateinit var actions: TableColumn<CottageView, Unit>
 
     @FXML
     lateinit var tableView: TableView<CottageView>
@@ -76,8 +76,8 @@ class CottageController : Initializable {
     }
 
     private fun setupActionColumn() {
-        actions.cellFactory = Callback<TableColumn<CottageView, Void?>, TableCell<CottageView, Void?>> {
-            object : TableCell<CottageView, Void?>() {
+        actions.cellFactory = Callback<TableColumn<CottageView, Unit?>, TableCell<CottageView, Unit?>> {
+            object : TableCell<CottageView, Unit?>() {
                 private val panel = HBox(5.0).apply {
                     alignment = Pos.CENTER
                     children.add(
@@ -95,7 +95,7 @@ class CottageController : Initializable {
                     )
                 }
 
-                override fun updateItem(item: Void?, empty: Boolean) {
+                override fun updateItem(item: Unit?, empty: Boolean) {
                     super.updateItem(item, empty)
                     graphic = if (empty) null else panel
                 }

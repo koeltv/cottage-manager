@@ -63,6 +63,14 @@ open class ReservationCreateController : Initializable {
 
     internal val fieldValidityMap: ObservableMap<Control, Boolean> = FXCollections.observableHashMap()
 
+    companion object {
+        val digitOrBackSpaceRegex = Regex("[^0-9\b]")
+        val partialPriceRegex = Regex("\\d+([.,]\\d{0,2})?")
+        val partialConfirmationCodeRegex = Regex("[^0-9A-Z\b]")
+        val digitAndBackspaceRegex = Regex("[0-9\b]")
+        val partialPhoneNumberRegex = Regex("\\+\\d{0,12}")
+    }
+
     override fun initialize(location: URL?, resources: ResourceBundle?) {
         fieldValidityMap.putAll(
             mapOf(
@@ -113,7 +121,7 @@ open class ReservationCreateController : Initializable {
 
         confirmationCodeField.setOnKeyTyped { event ->
             val source = event.source as TextInputControl
-            if (source.text.length > 10 || event.character.matches(Regex("[^0-9A-Z\b]"))) source.deletePreviousChar()
+            if (source.text.length > 10 || event.character.matches(partialConfirmationCodeRegex)) source.deletePreviousChar()
             fieldValidityMap.replace(confirmationCodeField, source.text.length == 10)
         }
 
@@ -121,27 +129,39 @@ open class ReservationCreateController : Initializable {
             val source = event.source as TextInputControl
             fieldValidityMap.replace(nameField, source.text.length > 2)
         }
+
         priceField.setOnKeyTyped { event ->
             val source = event.source as TextInputControl
-            if (!Regex("\\d+([.,]\\d{0,2})?").matches(source.text)) source.deletePreviousChar()
+            if (!partialPriceRegex.matches(source.text)) source.deletePreviousChar()
             fieldValidityMap.replace(priceField, source.text.isNotEmpty())
         }
+
         adultCountField.setOnKeyTyped { event ->
             val source = event.source as TextInputControl
-            if (source.text.length > 2 || event.character.matches(Regex("[^0-9\b]"))) source.deletePreviousChar()
+            if (source.text.length > 2 || event.character.matches(digitOrBackSpaceRegex)) source.deletePreviousChar()
             fieldValidityMap.replace(adultCountField, source.text.isNotEmpty())
         }
-        childCountField.setOnKeyTyped { event ->
+
+        childCountField.setFormat { it.length <= 2 }
+        childCountField.setAllowedCharacters(digitOrBackSpaceRegex)
+
+        babyCountField.setFormat { it.length <= 2 }
+        babyCountField.setAllowedCharacters(digitAndBackspaceRegex)
+
+        phoneNumberField.setFormat { it.length <= 12 && partialPhoneNumberRegex.matches(it) }
+    }
+
+    private fun TextField.setAllowedCharacters(regex: Regex) {
+        setOnKeyTyped { event ->
             val source = event.source as TextInputControl
-            if (source.text.length > 2 || event.character.matches(Regex("[^0-9\b]"))) source.deletePreviousChar()
+            if (!event.character.matches(regex)) source.deletePreviousChar()
         }
-        babyCountField.setOnKeyTyped { event ->
+    }
+
+    private fun TextField.setFormat(isValid: (String) -> Boolean) {
+        setOnKeyTyped { event ->
             val source = event.source as TextInputControl
-            if (source.text.length > 2 || event.character.matches(Regex("[^0-9\b]"))) source.deletePreviousChar()
-        }
-        phoneNumberField.setOnKeyTyped { event ->
-            val source = event.source as TextInputControl
-            if (source.text.length > 12 || !Regex("\\+\\d{0,12}").matches(source.text)) source.deletePreviousChar()
+            if (!isValid(source.text)) source.deletePreviousChar()
         }
     }
 
@@ -162,7 +182,6 @@ open class ReservationCreateController : Initializable {
             }
 
             Reservation.new(confirmationCodeField.text) {
-//                confirmationCode = confirmationCodeField.text
                 status = if (arrivalDateField.value < LocalDate.now()) "Ancien voyageur" else "Confirmée"
                 client = knownClient
                 adultCount = adultCountField.text.toUByte()

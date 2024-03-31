@@ -7,7 +7,7 @@ import java.io.File
 
 object DatabaseManager {
     fun init() {
-        File("./db").mkdir()
+        File("./db").mkdirs()
 
         Database.connect(
             url = "jdbc:sqlite:./db/testDb.db",
