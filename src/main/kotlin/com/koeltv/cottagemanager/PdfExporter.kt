@@ -16,6 +16,7 @@ import java.util.*
  */
 object PdfExporter {
     private val boldFont: Font = FontFactory.getFont(FontFactory.HELVETICA_BOLD)
+    private val dayMonthDateFormatter = DateTimeFormatter.ofPattern("dd/MM")
 
     fun exportFormattedReservations(
         outputFile: File,
@@ -38,14 +39,14 @@ object PdfExporter {
 
                 for (reservation in reservations) {
                     if (reservation.arrivalDate.year > currentYear) {
-                        addYearSumUp(reservations, currentYear)
+                        addYearSumUp(reservations, currentYear, censored)
                         add(Paragraph("\n"))
                         currentYear = reservation.arrivalDate.year
                     }
                     addFormattedReservation(pageSize.width, reservation, censored)
                 }
 
-                addYearSumUp(reservations, currentYear)
+                addYearSumUp(reservations, currentYear, censored)
             }
 
             println("Export success !")
@@ -75,17 +76,15 @@ object PdfExporter {
 
     private fun Document.addYearSumUp(
         reservations: Collection<Reservation>,
-        currentYear: Int
+        currentYear: Int,
+        censored: Boolean = false
     ) {
         val yearlyReservations = reservations.filter { it.arrivalDate.year == currentYear }
-        add(
-            Paragraph(
-                "$currentYear = ${yearlyReservations.size} locations = ${
-                    yearlyReservations.sumOf { it.price }.toPriceString()
-                }",
-                boldFont
-            )
-        )
+        var sumUp = "$currentYear = ${yearlyReservations.size} locations"
+        if (!censored) {
+            sumUp += " = ${yearlyReservations.sumOf { it.price }.toPriceString()}"
+        }
+        add(Paragraph(sumUp, boldFont))
     }
 
     private fun Document.addFormattedReservation(
@@ -101,62 +100,38 @@ object PdfExporter {
 
         // Line 0 - Month and Year with no border
         val formattedMonth = reservation.arrivalDate.month.getDisplayName(TextStyle.FULL_STANDALONE, Locale.FRANCE)
-        table.addCell(
-            PdfPCell(
-                Paragraph("${formattedMonth.uppercaseFirst()} ${reservation.arrivalDate.year}\n")
-            ).apply {
-                borderWidth = 0f
-                colspan = 6
-            }
-        )
+        table.addCenteredTextCell("${formattedMonth.uppercaseFirst()} ${reservation.arrivalDate.year}\n", colspan = 6)
         // Line 1
-        table.addCell(PdfPCell(
-            Paragraph(
-                "Du ${reservation.arrivalDate.format(DateTimeFormatter.ofPattern("dd/MM"))} au ${
-                    reservation.departureDate.format(
-                        DateTimeFormatter.ofPattern("dd/MM")
-                    )
-                }"
-            )
-        ).apply {
+        table.addCenteredTextCell(
+            "Du ${reservation.arrivalDate.format(dayMonthDateFormatter)} au ${
+                reservation.departureDate.format(dayMonthDateFormatter)
+            }",
             colspan = 2
-            horizontalAlignment = Element.ALIGN_CENTER
-        })
-        table.addCell(PdfPCell(Paragraph(reservation.note?.toPlusNote())).apply {
-            colspan = 1
-            horizontalAlignment = Element.ALIGN_CENTER
-        })
+        )
+        table.addCenteredTextCell(reservation.note?.toPlusNote(), colspan = 1)
 
         var personCountString = "${reservation.adultCount} adultes"
         if (reservation.childCount > 0u) personCountString += ", ${reservation.childCount} enfant"
         if (reservation.babyCount > 0u) personCountString += ", ${reservation.babyCount} BB"
 
-        table.addCell(PdfPCell(Paragraph(personCountString)).apply {
-            colspan = 3
-            horizontalAlignment = Element.ALIGN_CENTER
-        })
+        table.addCenteredTextCell(personCountString, colspan = 3)
         // Line 2
-        table.addCell(PdfPCell(Paragraph(reservation.client.name)).apply {
-            colspan = 3
-            horizontalAlignment = Element.ALIGN_CENTER
-        })
-        table.addCell(PdfPCell(Paragraph(reservation.confirmationCode)).apply {
-            colspan = 3
-            horizontalAlignment = Element.ALIGN_CENTER
-        })
+        table.addCenteredTextCell(reservation.client.name, colspan = 3)
+        table.addCenteredTextCell(reservation.confirmationCode, colspan = 3)
         // Line 3 (can be censored)
         if (!censored) {
-            table.addCell(PdfPCell(Paragraph(reservation.client.phoneNumber)).apply {
-                colspan = 3
-                horizontalAlignment = Element.ALIGN_CENTER
-            })
-            table.addCell(PdfPCell(Paragraph(reservation.price.toPriceString())).apply {
-                colspan = 3
-                horizontalAlignment = Element.ALIGN_CENTER
-            })
+            table.addCenteredTextCell(reservation.client.phoneNumber, colspan = 3)
+            table.addCenteredTextCell(reservation.price.toPriceString(), colspan = 3)
         }
 
         add(table)
         add(Paragraph("\n"))
+    }
+
+    private fun PdfPTable.addCenteredTextCell(text: String?, colspan: Int): PdfPCell {
+        return addCell(PdfPCell(Paragraph(text)).apply {
+            this.colspan = colspan
+            this.horizontalAlignment = Element.ALIGN_CENTER
+        })
     }
 }
