@@ -10,6 +10,13 @@ import java.util.zip.ZipInputStream
 const val MAX_RETRIES: Int = 5
 const val RETRY_DELAY: Long = 1000
 
+val updateLogFile: File by lazy {
+    val formattedDateTime = LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS).toString()
+        .replace(":", "")
+        .replace("-", "")
+    File("update-$formattedDateTime.log").also { it.createNewFile() }
+}
+
 val ignoredFileNames = listOf(
     "app/updater",
     "cottage-manager.exe",
@@ -38,11 +45,15 @@ fun main() {
         println("No update archive, skipping updating process")
     } else {
         val zipFile = File(updateZipPath)
+        updateLogFile.appendText("Starting update using ${zipFile.absolutePath}\n")
 
+        updateLogFile.appendText("Unzipping... ")
         val directory = unzipFile(zipFile)
+        updateLogFile.appendText("file unzipped to ${directory.absolutePath}\n")
         zipFile.deleteRecursively()
 
-        copyDirectory(directory, File(""))
+        updateLogFile.appendText("Updating files...\n")
+        copyDirectory(directory, currentFile)
         directory.deleteRecursively()
     }
 }
@@ -68,12 +79,6 @@ fun unzipFile(file: File, outputDirectory: String = file.nameWithoutExtension): 
 fun copyDirectory(sourceDirectory: File, targetDirectory: File) {
     val sourceDirectoryPath = sourceDirectory.toPath()
     val targetDirectoryPath = targetDirectory.toPath()
-
-    val formattedDateTime = LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS).toString()
-        .replace(":", "")
-        .replace("-", "")
-    val updateLogFile = File("update-$formattedDateTime.log")
-    updateLogFile.createNewFile()
 
     Files.walkFileTree(sourceDirectoryPath, object : SimpleFileVisitor<Path>() {
         override fun preVisitDirectory(dir: Path, attrs: BasicFileAttributes): FileVisitResult {

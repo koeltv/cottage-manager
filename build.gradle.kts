@@ -71,7 +71,6 @@ runtime {
     addOptions("--strip-debug", "--compress", "2", "--no-header-files", "--no-man-pages")
     modules = listOf(
         "java.desktop",
-        "jdk.jfr",
         "java.xml",
         "jdk.unsupported",
         "java.scripting",
@@ -79,7 +78,10 @@ runtime {
         "java.sql",
         "java.logging",
         "java.naming",
+        // Needed for update mechanism
         "jdk.crypto.ec",
+        "java.datatransfer",
+        "jdk.zipfs",
     )
 
     launcher {
