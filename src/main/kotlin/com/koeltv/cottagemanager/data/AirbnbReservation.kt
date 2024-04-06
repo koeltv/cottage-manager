@@ -47,7 +47,7 @@ data class AirbnbReservation(
                         confirmationCode = data[0],
                         status = data[1],
                         name = data[2],
-                        phoneNumber = data[3].replace(" ", ""),
+                        phoneNumber = data[3].replace(Regex("[ -]"), ""),
                         adultCount = data[4].toInt(),
                         childCount = data[5].toInt(),
                         babyCount = data[6].toInt(),
