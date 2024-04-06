@@ -1,7 +1,7 @@
 package com.koeltv.cottagemanager
 
+import com.koeltv.cottagemanager.data.Cottage
 import com.koeltv.cottagemanager.db.CottageService
-import com.koeltv.cottagemanager.db.CottageView
 import javafx.fxml.FXML
 import javafx.fxml.Initializable
 import javafx.scene.control.Button
@@ -33,7 +33,7 @@ open class CottageCreateController: Initializable, KoinComponent {
 
     @FXML
     open fun onConfirmButtonClick() {
-        cottageService.create(CottageView(
+        cottageService.create(Cottage(
             name = nameField.text,
             alias = aliasField.text.ifBlank { nameField.text }
         ))

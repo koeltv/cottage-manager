@@ -1,6 +1,6 @@
 package com.koeltv.cottagemanager
 
-import com.koeltv.cottagemanager.db.ReservationView
+import com.koeltv.cottagemanager.data.Reservation
 import com.lowagie.text.*
 import com.lowagie.text.pdf.PdfPCell
 import com.lowagie.text.pdf.PdfPTable
@@ -21,7 +21,7 @@ object PdfExporter {
 
     fun exportFormattedReservations(
         outputFile: File,
-        reservations: SortedSet<ReservationView>,
+        reservations: SortedSet<Reservation>,
         censored: Boolean = false
     ) {
         println("Exporting to $outputFile...")
@@ -60,7 +60,7 @@ object PdfExporter {
         document.close()
     }
 
-    private fun Document.addTitle(reservations: Collection<ReservationView>) {
+    private fun Document.addTitle(reservations: Collection<Reservation>) {
         val cottageAliases = reservations.map { it.cottage.alias }.distinct()
         val title = if (cottageAliases.size == 1) {
             cottageAliases.first()
@@ -76,7 +76,7 @@ object PdfExporter {
     }
 
     private fun Document.addYearSumUp(
-        reservations: Collection<ReservationView>,
+        reservations: Collection<Reservation>,
         currentYear: Int,
         censored: Boolean = false
     ) {
@@ -90,7 +90,7 @@ object PdfExporter {
 
     private fun Document.addFormattedReservation(
         width: Float,
-        reservation: ReservationView,
+        reservation: Reservation,
         censored: Boolean = false
     ) {
         val table = PdfPTable(6)

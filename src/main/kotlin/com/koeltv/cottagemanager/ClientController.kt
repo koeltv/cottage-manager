@@ -1,7 +1,7 @@
 package com.koeltv.cottagemanager
 
+import com.koeltv.cottagemanager.data.ClientWithStats
 import com.koeltv.cottagemanager.db.ClientService
-import com.koeltv.cottagemanager.db.ClientWithStatsView
 import javafx.fxml.FXML
 import javafx.fxml.FXMLLoader
 import javafx.fxml.Initializable
@@ -27,15 +27,15 @@ class ClientController: Initializable, KoinComponent {
     @FXML
     lateinit var root: BorderPane
 
-    lateinit var name: TableColumn<ClientWithStatsView, String>
-    lateinit var phoneNumber: TableColumn<ClientWithStatsView, String?>
-    lateinit var nationality: TableColumn<ClientWithStatsView, String?>
-    lateinit var averageNote: TableColumn<ClientWithStatsView, String>
-    lateinit var reservationCount: TableColumn<ClientWithStatsView, Int>
-    lateinit var comments: TableColumn<ClientWithStatsView, String>
-    lateinit var actions: TableColumn<ClientWithStatsView, Unit>
+    lateinit var name: TableColumn<ClientWithStats, String>
+    lateinit var phoneNumber: TableColumn<ClientWithStats, String?>
+    lateinit var nationality: TableColumn<ClientWithStats, String?>
+    lateinit var averageNote: TableColumn<ClientWithStats, String>
+    lateinit var reservationCount: TableColumn<ClientWithStats, Int>
+    lateinit var comments: TableColumn<ClientWithStats, String>
+    lateinit var actions: TableColumn<ClientWithStats, Unit>
 
-    lateinit var tableView: TableView<ClientWithStatsView>
+    lateinit var tableView: TableView<ClientWithStats>
 
     private val clientService : ClientService by inject()
 
@@ -77,8 +77,8 @@ class ClientController: Initializable, KoinComponent {
     }
 
     private fun setupActionColumn() {
-        actions.cellFactory = Callback<TableColumn<ClientWithStatsView, Unit?>, TableCell<ClientWithStatsView, Unit?>> {
-            object : TableCell<ClientWithStatsView, Unit?>() {
+        actions.cellFactory = Callback<TableColumn<ClientWithStats, Unit?>, TableCell<ClientWithStats, Unit?>> {
+            object : TableCell<ClientWithStats, Unit?>() {
                 private val panel = HBox(5.0).apply {
                     alignment = Pos.CENTER
                     children.add(

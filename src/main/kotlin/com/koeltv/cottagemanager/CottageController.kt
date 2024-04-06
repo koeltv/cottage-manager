@@ -1,7 +1,7 @@
 package com.koeltv.cottagemanager
 
+import com.koeltv.cottagemanager.data.Cottage
 import com.koeltv.cottagemanager.db.CottageService
-import com.koeltv.cottagemanager.db.CottageView
 import javafx.fxml.FXML
 import javafx.fxml.FXMLLoader
 import javafx.fxml.Initializable
@@ -28,12 +28,12 @@ class CottageController : Initializable, KoinComponent {
     @FXML
     lateinit var root: BorderPane
 
-    lateinit var name: TableColumn<CottageView, String>
-    lateinit var alias: TableColumn<CottageView, String>
-    lateinit var actions: TableColumn<CottageView, Unit>
+    lateinit var name: TableColumn<Cottage, String>
+    lateinit var alias: TableColumn<Cottage, String>
+    lateinit var actions: TableColumn<Cottage, Unit>
 
     @FXML
-    lateinit var tableView: TableView<CottageView>
+    lateinit var tableView: TableView<Cottage>
 
     private val cottageService: CottageService by inject()
 
@@ -71,8 +71,8 @@ class CottageController : Initializable, KoinComponent {
     }
 
     private fun setupActionColumn() {
-        actions.cellFactory = Callback<TableColumn<CottageView, Unit?>, TableCell<CottageView, Unit?>> {
-            object : TableCell<CottageView, Unit?>() {
+        actions.cellFactory = Callback<TableColumn<Cottage, Unit?>, TableCell<Cottage, Unit?>> {
+            object : TableCell<Cottage, Unit?>() {
                 private val panel = HBox(5.0).apply {
                     alignment = Pos.CENTER
                     children.add(

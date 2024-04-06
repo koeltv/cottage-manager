@@ -1,9 +1,9 @@
 package com.koeltv.cottagemanager
 
+import com.koeltv.cottagemanager.data.Reservation
 import com.koeltv.cottagemanager.db.ClientService
 import com.koeltv.cottagemanager.db.CottageService
 import com.koeltv.cottagemanager.db.ReservationService
-import com.koeltv.cottagemanager.db.ReservationView
 import javafx.beans.property.SimpleStringProperty
 import javafx.event.ActionEvent
 import javafx.fxml.FXML
@@ -42,19 +42,19 @@ class ReservationController : Initializable, KoinComponent {
     @FXML
     lateinit var cottageSelectionField: ChoiceBox<String>
 
-    lateinit var arrivalDate: TableColumn<ReservationView, LocalDate>
-    lateinit var departureDate: TableColumn<ReservationView, LocalDate>
-    lateinit var client: TableColumn<ReservationView, String>
-    lateinit var repartition: TableColumn<ReservationView, String>
-    lateinit var nationality: TableColumn<ReservationView, String>
-    lateinit var price: TableColumn<ReservationView, String>
-    lateinit var note: TableColumn<ReservationView, String>
-    lateinit var code: TableColumn<ReservationView, String>
-    lateinit var comments: TableColumn<ReservationView, String>
-    lateinit var actions: TableColumn<ReservationView, Unit>
+    lateinit var arrivalDate: TableColumn<Reservation, LocalDate>
+    lateinit var departureDate: TableColumn<Reservation, LocalDate>
+    lateinit var client: TableColumn<Reservation, String>
+    lateinit var repartition: TableColumn<Reservation, String>
+    lateinit var nationality: TableColumn<Reservation, String>
+    lateinit var price: TableColumn<Reservation, String>
+    lateinit var note: TableColumn<Reservation, String>
+    lateinit var code: TableColumn<Reservation, String>
+    lateinit var comments: TableColumn<Reservation, String>
+    lateinit var actions: TableColumn<Reservation, Unit>
 
     @FXML
-    lateinit var tableView: TableView<ReservationView>
+    lateinit var tableView: TableView<Reservation>
 
     val reservationService: ReservationService by inject()
     val cottageService: CottageService by inject()
@@ -133,14 +133,14 @@ class ReservationController : Initializable, KoinComponent {
     }
 
     private fun setupActionColumn() {
-        actions.cellFactory = Callback<TableColumn<ReservationView, Unit?>, TableCell<ReservationView, Unit?>> {
-            object : TableCell<ReservationView, Unit?>() {
+        actions.cellFactory = Callback<TableColumn<Reservation, Unit?>, TableCell<Reservation, Unit?>> {
+            object : TableCell<Reservation, Unit?>() {
                 private val panel = HBox(5.0).apply {
                     alignment = Pos.CENTER
                     children.addAll(
                         Button("", Glyph("FontAwesome", FontAwesome.Glyph.EDIT)).also {
                             it.setOnAction {
-                                val data: ReservationView = tableView.items[index]
+                                val data: Reservation = tableView.items[index]
                                 println("toEdit: $data")
 
                                 val fxmlLoader =
@@ -152,7 +152,7 @@ class ReservationController : Initializable, KoinComponent {
                         },
                         Button("", Glyph("FontAwesome", FontAwesome.Glyph.TRASH)).also {
                             it.setOnAction {
-                                val data: ReservationView = tableView.items[index]
+                                val data: Reservation = tableView.items[index]
                                 println("toDelete: $data")
 
                                 val alert = Alert(Alert.AlertType.CONFIRMATION).apply {

@@ -1,6 +1,6 @@
 package com.koeltv.cottagemanager.db
 
-import com.koeltv.cottagemanager.db.ReservationService.Reservation
+import com.koeltv.cottagemanager.data.ClientWithStats
 import org.jetbrains.exposed.dao.Entity
 import org.jetbrains.exposed.dao.EntityChangeType
 import org.jetbrains.exposed.dao.EntityClass
@@ -10,15 +10,7 @@ import org.jetbrains.exposed.dao.id.IdTable
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.SchemaUtils
 import org.jetbrains.exposed.sql.transactions.transaction
-
-data class ClientView(val name: String, val phoneNumber: String, val nationality: String)
-data class ClientWithStatsView(
-    val name: String,
-    val phoneNumber: String,
-    val nationality: String,
-    val averageNote: Int?,
-    val reservationCount: Int,
-)
+import com.koeltv.cottagemanager.data.Client as DataClient
 
 class ClientService(private val database: Database) {
     internal object Clients : IdTable<String>() {
@@ -37,7 +29,7 @@ class ClientService(private val database: Database) {
         var phoneNumber by Clients.phoneNumber
         var nationality by Clients.nationality
 
-        fun toView(): ClientView = ClientView(
+        fun toView(): DataClient = DataClient(
             name,
             phoneNumber ?: "",
             nationality ?: ""
@@ -50,14 +42,14 @@ class ClientService(private val database: Database) {
         }
     }
 
-    fun create(client: ClientView): ClientView = transaction(database) {
+    fun create(client: DataClient): DataClient = transaction(database) {
         Client.new(client.name) {
             phoneNumber = client.phoneNumber
             nationality = client.nationality
         }.toView()
     }
 
-    fun read(id: String): ClientView? = transaction(database) {
+    fun read(id: String): DataClient? = transaction(database) {
         Client.findById(id)?.toView()
     }
 
@@ -69,7 +61,7 @@ class ClientService(private val database: Database) {
         Client.findById(id)?.delete()
     }
 
-    fun readAll(): List<ClientView> = transaction {
+    fun readAll(): List<DataClient> = transaction {
         Client.all().map { it.toView() }
     }
 
@@ -82,29 +74,22 @@ class ClientService(private val database: Database) {
     }
 
     fun reservationCount(id: String): Long = transaction(database) {
-        Reservation.find { ReservationService.Reservations.client eq id }.count()
+        ReservationService.Reservation.find { ReservationService.Reservations.client eq id }.count()
     }
 
-    fun notesOf(id: String): List<Byte> = transaction(database) {
-        ReservationService.Reservation
-            .find { ReservationService.Reservations.client eq id }
-            .mapNotNull { it.note?.toByte() }
-            .toList()
-    }
-
-    fun readWithStats(id: String): ClientWithStatsView? = transaction(database) {
+    fun readWithStats(id: String): ClientWithStats? = transaction(database) {
         read(id)?.addStats()
     }
 
-    fun readAllWithStats(): List<ClientWithStatsView> = transaction(database) {
+    fun readAllWithStats(): List<ClientWithStats> = transaction(database) {
         readAll().map { it.addStats() }
     }
 
-    private fun ClientView.addStats(): ClientWithStatsView {
-        val reservations = Reservation.find { ReservationService.Reservations.client eq name }.toList()
+    private fun DataClient.addStats(): ClientWithStats {
+        val reservations = ReservationService.Reservation.find { ReservationService.Reservations.client eq name }.toList()
         val notes = reservations.mapNotNull { it.note?.toInt() }
 
-        return ClientWithStatsView(
+        return ClientWithStats(
             name = name,
             phoneNumber = phoneNumber,
             nationality = nationality,

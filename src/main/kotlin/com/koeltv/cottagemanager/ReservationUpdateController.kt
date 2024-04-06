@@ -1,6 +1,6 @@
 package com.koeltv.cottagemanager
 
-import com.koeltv.cottagemanager.db.ClientView
+import com.koeltv.cottagemanager.data.Client
 import javafx.fxml.FXML
 import javafx.scene.layout.Pane
 import java.net.URL
@@ -46,7 +46,7 @@ class ReservationUpdateController(private val reservationId: String) : Reservati
             }
         } else { // Create new and delete old if necessary
             val client = clientService.create(
-                ClientView(
+                Client(
                     name = nameField.text,
                     phoneNumber = phoneNumberField.text,
                     nationality = nationalityField.text

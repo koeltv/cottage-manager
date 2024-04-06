@@ -1,6 +1,10 @@
 package com.koeltv.cottagemanager
 
-import com.koeltv.cottagemanager.db.*
+import com.koeltv.cottagemanager.data.Client
+import com.koeltv.cottagemanager.data.Reservation
+import com.koeltv.cottagemanager.db.ClientService
+import com.koeltv.cottagemanager.db.CottageService
+import com.koeltv.cottagemanager.db.ReservationService
 import javafx.collections.FXCollections
 import javafx.collections.MapChangeListener
 import javafx.collections.ObservableMap
@@ -172,13 +176,16 @@ open class ReservationCreateController : Initializable, KoinComponent {
 
     @FXML
     open fun onConfirmButtonClick() {
-        val client = clientService.read(nameField.text) ?: clientService.create(ClientView(
+        val client = clientService.read(nameField.text) ?: clientService.create(
+            Client(
             name = nameField.text,
             phoneNumber = phoneNumberField.text,
             nationality = nationalityField.text
-        ))
+        )
+        )
 
-        reservationService.create(ReservationView(
+        reservationService.create(
+            Reservation(
             code = confirmationCodeField.text,
             //status
             client = client,
@@ -198,7 +205,8 @@ open class ReservationCreateController : Initializable, KoinComponent {
             },
             note = noteField.value.toNote().toInt(),
             comments = commentsArea.text
-        ))
+        )
+        )
 
         (root.parent as Pane).children.remove(root)
     }

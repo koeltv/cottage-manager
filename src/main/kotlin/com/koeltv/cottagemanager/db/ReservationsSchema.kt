@@ -12,22 +12,7 @@ import org.jetbrains.exposed.sql.SchemaUtils
 import org.jetbrains.exposed.sql.insertIgnore
 import org.jetbrains.exposed.sql.javatime.date
 import org.jetbrains.exposed.sql.transactions.transaction
-import java.time.LocalDate
-
-data class ReservationView(
-    val code: String,
-    val client: ClientView,
-    val adultCount: Int,
-    val childCount: Int,
-    val babyCount: Int,
-    val arrivalDate: LocalDate,
-    val departureDate: LocalDate,
-    val reservationDate: LocalDate?,
-    val cottage: CottageView,
-    val price: Int,
-    val note: Int?,
-    val comments: String,
-)
+import com.koeltv.cottagemanager.data.Reservation as DataReservation
 
 class ReservationService(private val database: Database) {
     internal object Reservations : IdTable<String>() {
@@ -72,7 +57,7 @@ class ReservationService(private val database: Database) {
         var note by Reservations.note
         var comments by Reservations.comments
 
-        fun toView(): ReservationView = ReservationView(
+        fun toView(): DataReservation = DataReservation(
             code = confirmationCode,
             client = client.toView(),
             adultCount = adultCount.toInt(),
@@ -94,7 +79,7 @@ class ReservationService(private val database: Database) {
         }
     }
 
-    fun create(reservation: ReservationView): String = transaction(database) {
+    fun create(reservation: DataReservation): String = transaction(database) {
         Reservation.new(reservation.code) {
             client = ClientService.Client.findById(reservation.client.name)!!
             adultCount = reservation.adultCount.toUByte()
@@ -110,7 +95,7 @@ class ReservationService(private val database: Database) {
         }.confirmationCode
     }
 
-    fun read(id: String): ReservationView? = transaction(database) {
+    fun read(id: String): DataReservation? = transaction(database) {
         Reservation.findById(id)?.toView()
     }
 
@@ -122,7 +107,7 @@ class ReservationService(private val database: Database) {
         Reservation.findById(id)?.delete()
     }
 
-    fun readAll(): List<ReservationView> = transaction(database) {
+    fun readAll(): List<DataReservation> = transaction(database) {
         Reservation.all().map { it.toView() }
     }
 

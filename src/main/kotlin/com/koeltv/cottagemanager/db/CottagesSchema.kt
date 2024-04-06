@@ -9,8 +9,7 @@ import org.jetbrains.exposed.dao.id.IdTable
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.SchemaUtils
 import org.jetbrains.exposed.sql.transactions.transaction
-
-data class CottageView(val name: String, val alias: String)
+import com.koeltv.cottagemanager.data.Cottage as DataCottage
 
 class CottageService(private val database: Database) {
     internal object Cottages : IdTable<String>() {
@@ -27,7 +26,8 @@ class CottageService(private val database: Database) {
         var name by Cottages.name
         var alias by Cottages.alias
 
-        fun toView(): CottageView = CottageView(name, alias)
+        fun toView(): DataCottage =
+            DataCottage(name, alias)
     }
 
     init {
@@ -36,13 +36,13 @@ class CottageService(private val database: Database) {
         }
     }
 
-    fun create(cottage: CottageView): String = transaction(database) {
+    fun create(cottage: DataCottage): String = transaction(database) {
         Cottage.new(cottage.name) {
             alias = cottage.alias
         }.name
     }
 
-    fun read(id: String): CottageView? = transaction(database) {
+    fun read(id: String): DataCottage? = transaction(database) {
         Cottage.findById(id)?.toView()
     }
 
@@ -54,7 +54,7 @@ class CottageService(private val database: Database) {
         Cottage.findById(id)?.delete()
     }
 
-    fun readAll(): List<CottageView> = transaction {
+    fun readAll(): List<DataCottage> = transaction {
         Cottage.all().map { it.toView() }
     }
 
