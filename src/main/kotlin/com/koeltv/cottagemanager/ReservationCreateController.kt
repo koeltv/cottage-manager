@@ -1,5 +1,6 @@
 package com.koeltv.cottagemanager
 
+import com.koeltv.cottagemanager.db.*
 import javafx.collections.FXCollections
 import javafx.collections.MapChangeListener
 import javafx.collections.ObservableMap
@@ -9,13 +10,14 @@ import javafx.fxml.Initializable
 import javafx.scene.control.*
 import javafx.scene.layout.Pane
 import javafx.scene.layout.VBox
-import org.jetbrains.exposed.sql.transactions.transaction
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 import java.net.URL
 import java.time.LocalDate
 import java.util.*
 
 
-open class ReservationCreateController : Initializable {
+open class ReservationCreateController : Initializable, KoinComponent {
     @FXML
     lateinit var root: VBox
 
@@ -63,6 +65,10 @@ open class ReservationCreateController : Initializable {
 
     internal val fieldValidityMap: ObservableMap<Control, Boolean> = FXCollections.observableHashMap()
 
+    val reservationService: ReservationService by inject()
+    val cottageService: CottageService by inject()
+    val clientService: ClientService by inject()
+
     companion object {
         val digitOrBackSpaceRegex = Regex("[^0-9\b]")
         val partialPriceRegex = Regex("\\d+([.,]\\d{0,2})?")
@@ -99,18 +105,12 @@ open class ReservationCreateController : Initializable {
         noteField.items.setAll("-----", "----", "---", "--", "-", "+", "++", "+++", "++++", "+++++")
         noteField.value = "+"
 
-        transaction {
-            Cottage.all()
-                .map { it.alias }
-                .forEach { cottageField.items.add(it) }
-        }
+        cottageField.items.addAll(cottageService.readAll().map { it.alias })
         cottageField.value = cottageField.items.first()
 
         // Name field setup with autocomplete
         val entries = TreeSet<String>()
-        transaction {
-            Client.all().forEach { entries.add(it.name) }
-        }
+        entries.addAll(clientService.readAll().map { it.name })
         nameField.entries.addAll(entries)
         nameField.entryMenu.setOnAction { event ->
             (event.target as MenuItem).addEventHandler(Event.ANY) {
@@ -172,35 +172,33 @@ open class ReservationCreateController : Initializable {
 
     @FXML
     open fun onConfirmButtonClick() {
-        val clientName = nameField.text
+        val client = clientService.read(nameField.text) ?: clientService.create(ClientView(
+            name = nameField.text,
+            phoneNumber = phoneNumberField.text,
+            nationality = nationalityField.text
+        ))
 
-        transaction {
-            val knownClient = Client.findById(clientName) ?: Client.new {
-                name = clientName
-                phoneNumber = phoneNumberField.text
-                nationality = nationalityField.text
-            }
-
-            Reservation.new(confirmationCodeField.text) {
-                status = if (arrivalDateField.value < LocalDate.now()) "Ancien voyageur" else "Confirmée"
-                client = knownClient
-                adultCount = adultCountField.text.toUByte()
-                childCount = childCountField.text.toUByteOrNull() ?: 0U
-                babyCount = babyCountField.text.toUByteOrNull() ?: 0U
-                arrivalDate = arrivalDateField.value
-                departureDate = departureDateField.value
-                nightCount = arrivalDateField.value.until(departureDateField.value).days.toUShort()
-                reservationDate = LocalDate.now()
-                cottage = Cottage.all().first { it.alias == cottageField.value }
-                price = priceField.text.let {
-                    Regex("(\\d+)([,.](\\d{0,2}))?")
-                        .find(it)!!.destructured
-                        .let { (euros, _, cents) -> "$euros${cents.padEnd(2, '0')}" }
-                }.toUInt()
-                note = noteField.value.toNote()
-                comments = commentsArea.text
-            }
-        }
+        reservationService.create(ReservationView(
+            code = confirmationCodeField.text,
+            //status
+            client = client,
+            adultCount = adultCountField.text.toInt(),
+            childCount = childCountField.text.toIntOrNull() ?: 0,
+            babyCount = babyCountField.text.toIntOrNull() ?: 0,
+            arrivalDate = arrivalDateField.value,
+            departureDate = departureDateField.value,
+            //nightCount
+            reservationDate = LocalDate.now(),
+            cottage = cottageService.readAll().first { it.alias == cottageField.value },
+            price = priceField.text.let {
+                Regex("(\\d+)([,.](\\d{0,2}))?")
+                    .find(it)!!.destructured
+                    .let { (euros, _, cents) -> "$euros${cents.padEnd(2, '0')}" }
+                    .toInt()
+            },
+            note = noteField.value.toNote().toInt(),
+            comments = commentsArea.text
+        ))
 
         (root.parent as Pane).children.remove(root)
     }

@@ -1,7 +1,7 @@
 package com.koeltv.cottagemanager
 
-import com.koeltv.cottagemanager.data.CottageView
-import com.koeltv.cottagemanager.data.toView
+import com.koeltv.cottagemanager.db.CottageService
+import com.koeltv.cottagemanager.db.CottageView
 import javafx.fxml.FXML
 import javafx.fxml.FXMLLoader
 import javafx.fxml.Initializable
@@ -18,13 +18,13 @@ import javafx.util.Callback
 import org.controlsfx.glyphfont.FontAwesome
 import org.controlsfx.glyphfont.Glyph
 import org.jetbrains.exposed.dao.EntityChangeType
-import org.jetbrains.exposed.dao.EntityHook
-import org.jetbrains.exposed.sql.transactions.transaction
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 import java.net.URL
 import java.util.*
 
 
-class CottageController : Initializable {
+class CottageController : Initializable, KoinComponent {
     @FXML
     lateinit var root: BorderPane
 
@@ -34,6 +34,8 @@ class CottageController : Initializable {
 
     @FXML
     lateinit var tableView: TableView<CottageView>
+
+    private val cottageService: CottageService by inject()
 
     @FXML
     private fun onBackButtonClick() {
@@ -46,32 +48,25 @@ class CottageController : Initializable {
         setupActionColumn()
 
         tableView.items.clear()
-        transaction {
-            Cottage.all()
-                .map { it.toView() }
-                .forEach { tableView.items.add(it) }
-        }
+        cottageService.readAll().forEach { tableView.items.add(it) }
 
         tableView.sortOrder.add(name)
 
-        EntityHook.subscribe { change ->
-            if (change.entityClass == Cottage) {
-                when(change.changeType) {
-                    EntityChangeType.Created -> {
-                        val newView = Cottage.findById(change.entityId.value as String)!!.toView()
-                        tableView.items.add(newView)
-                    }
-                    EntityChangeType.Updated -> {
-                        val updatedView = Cottage.findById(change.entityId.value as String)!!.toView()
-                        tableView.items.removeIf { it.name == updatedView.name }
-                        tableView.items.add(updatedView)
-                    }
-                    EntityChangeType.Removed -> {
-                        tableView.items.removeIf { it.name == change.entityId.value }
-                    }
+        cottageService.subscribe { id, eventType ->
+            when (eventType) {
+                EntityChangeType.Created -> {
+                    tableView.items.add(cottageService.read(id))
                 }
-                tableView.sort()
+                EntityChangeType.Updated -> {
+                    val updated = cottageService.read(id)!!
+                    tableView.items.removeIf { it.name == updated.name }
+                    tableView.items.add(updated)
+                }
+                EntityChangeType.Removed -> {
+                    tableView.items.removeIf { it.name == id }
+                }
             }
+            tableView.sort()
         }
     }
 

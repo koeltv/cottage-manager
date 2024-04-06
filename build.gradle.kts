@@ -24,6 +24,7 @@ val sqliteDriverVersion: String by project
 val controlFxVersion: String by project
 val logbackVersion: String by project
 val openpdfVersion: String by project
+val koinVersion: String by project
 
 val currentOs: OperatingSystem = OperatingSystem.current()
 
@@ -43,6 +44,9 @@ dependencies {
     implementation("org.jetbrains.exposed:exposed-jdbc:$exposedVersion")
     implementation("org.jetbrains.exposed:exposed-java-time:$exposedVersion")
 
+    implementation(platform("io.insert-koin:koin-bom:$koinVersion"))
+    implementation("io.insert-koin:koin-core")
+
     implementation("org.controlsfx:controlsfx:$controlFxVersion")
 
     implementation("org.xerial:sqlite-jdbc:${sqliteDriverVersion}")
@@ -52,6 +56,7 @@ dependencies {
     implementation("com.github.librepdf:openpdf:$openpdfVersion")
 
     testImplementation("org.jetbrains.kotlin:kotlin-test")
+    testImplementation("io.insert-koin:koin-test")
 }
 
 tasks.test {

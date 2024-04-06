@@ -1,7 +1,10 @@
 package com.koeltv.cottagemanager
 
-import com.koeltv.cottagemanager.data.ReservationView
-import com.koeltv.cottagemanager.data.toView
+import com.koeltv.cottagemanager.db.ClientService
+import com.koeltv.cottagemanager.db.CottageService
+import com.koeltv.cottagemanager.db.ReservationService
+import com.koeltv.cottagemanager.db.ReservationView
+import javafx.beans.property.SimpleStringProperty
 import javafx.event.ActionEvent
 import javafx.fxml.FXML
 import javafx.fxml.FXMLLoader
@@ -19,8 +22,8 @@ import javafx.util.Callback
 import org.controlsfx.glyphfont.FontAwesome
 import org.controlsfx.glyphfont.Glyph
 import org.jetbrains.exposed.dao.EntityChangeType
-import org.jetbrains.exposed.dao.EntityHook
-import org.jetbrains.exposed.sql.transactions.transaction
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 import java.io.File
 import java.net.URL
 import java.time.LocalDate
@@ -28,7 +31,7 @@ import java.util.*
 import kotlin.jvm.optionals.getOrNull
 
 
-class ReservationController : Initializable {
+class ReservationController : Initializable, KoinComponent {
     companion object {
         const val ALL_COTTAGES = "Tous les gîtes"
     }
@@ -53,6 +56,10 @@ class ReservationController : Initializable {
     @FXML
     lateinit var tableView: TableView<ReservationView>
 
+    val reservationService: ReservationService by inject()
+    val cottageService: CottageService by inject()
+    val clientService: ClientService by inject()
+
     @FXML
     private fun onBackButtonClick() {
         (root.parent as Pane).children.remove(root)
@@ -68,22 +75,19 @@ class ReservationController : Initializable {
     override fun initialize(location: URL?, resources: ResourceBundle?) {
         arrivalDate.cellValueFactory = PropertyValueFactory("arrivalDate")
         departureDate.cellValueFactory = PropertyValueFactory("departureDate")
-        client.cellValueFactory = PropertyValueFactory("client")
-        repartition.cellValueFactory = PropertyValueFactory("repartition")
-        nationality.cellValueFactory = PropertyValueFactory("nationality")
-        price.cellValueFactory = PropertyValueFactory("price")
-        note.cellValueFactory = PropertyValueFactory("note")
+        client.setCellValueFactory { SimpleStringProperty(it.value.client.name) }
+        repartition.setCellValueFactory { SimpleStringProperty("${it.value.adultCount}A, ${it.value.childCount}E, ${it.value.babyCount}BB") }
+        nationality.setCellValueFactory { SimpleStringProperty(it.value.client.nationality) }
+        price.setCellValueFactory { SimpleStringProperty(it.value.price.toUInt().toPriceString()) }
+        note.setCellValueFactory { SimpleStringProperty(it.value.note?.toUByte()?.toPlusNote() ?: "") }
         code.cellValueFactory = PropertyValueFactory("code")
         comments.cellValueFactory = PropertyValueFactory("comments")
         setupActionColumn()
 
         cottageSelectionField.items.add(ALL_COTTAGES)
         cottageSelectionField.value = ALL_COTTAGES
-        transaction {
-            Cottage.all()
-                .map { it.toView() }
-                .forEach { cottageSelectionField.items.add(it.alias) }
-        }
+        cottageService.readAll().forEach { cottageSelectionField.items.add(it.alias) }
+
         fetchReservations()
         cottageSelectionField.selectionModel.selectedItemProperty().addListener { _, oldValue, newValue ->
             if (oldValue != newValue) {
@@ -98,39 +102,33 @@ class ReservationController : Initializable {
         arrivalDate.sortType = TableColumn.SortType.DESCENDING
         tableView.sortOrder.add(arrivalDate)
 
-        EntityHook.subscribe { change ->
-            if (change.entityClass == Reservation) {
-                when(change.changeType) {
-                    EntityChangeType.Created -> {
-                        val newView = Reservation.findById(change.entityId.value as String)!!.toView()
-                        tableView.items.add(newView)
-                    }
-                    EntityChangeType.Updated -> {
-                        val updatedView = Reservation.findById(change.entityId.value as String)!!.toView()
-                        tableView.items.removeIf { it.code == updatedView.code }
-                        tableView.items.add(updatedView)
-                    }
-                    EntityChangeType.Removed -> {
-                        tableView.items.removeIf { it.code == change.entityId.value }
-                    }
+        reservationService.subscribe { id, changeType ->
+            when (changeType) {
+                EntityChangeType.Created -> {
+                    tableView.items.add(reservationService.read(id))
                 }
-                tableView.sort()
+                EntityChangeType.Updated -> {
+                    val updated = reservationService.read(id)!!
+                    tableView.items.removeIf { it.code == updated.code }
+                    tableView.items.add(updated)
+                }
+                EntityChangeType.Removed -> {
+                    tableView.items.removeIf { it.code == id }
+                }
             }
+            tableView.sort()
         }
     }
 
     private fun fetchReservations(cottageAlias: String? = null) {
         tableView.items.clear()
-        transaction {
-            val reservations = if (cottageAlias != null) {
-                Reservation.all().filter { it.cottage.alias == cottageAlias }
+        tableView.items.addAll(
+            if (cottageAlias != null) {
+                reservationService.readAll().filter { it.cottage.alias == cottageAlias }
             } else {
-                Reservation.all()
+                reservationService.readAll()
             }
-            reservations
-                .map { it.toView() }
-                .forEach { tableView.items.add(it) }
-        }
+        )
         tableView.sort()
     }
 
@@ -164,15 +162,10 @@ class ReservationController : Initializable {
 
                                 val result = alert.showAndWait()
                                 if (result.get() == ButtonType.OK) {
-                                    transaction {
-                                        val reservation = Reservation.findById(data.code)!!
-                                        val client = reservation.client
-
-                                        reservation.delete()
-
-                                        if (Reservation.find { Reservations.client eq client.id }.count() <= 0) {
-                                            client.delete()
-                                        }
+                                    val reservation = reservationService.read(data.code)!!
+                                    reservationService.delete(reservation.code)
+                                    if (clientService.reservationCount(reservation.client.name) <= 0) {
+                                        clientService.delete(reservation.client.name)
                                     }
                                 }
                             }
@@ -219,17 +212,13 @@ class ReservationController : Initializable {
         println(file)
 
         if (file != null) {
-            transaction {
-                PdfExporter.exportFormattedReservations(
-                    file,
-                    if (cottageSelectionField.value != ALL_COTTAGES) {
-                        Reservation.all().filter { it.cottage.alias == cottageSelectionField.value }
-                    } else {
-                        Reservation.all()
-                    }.toSortedSet { res1, res2 -> res1.arrivalDate.compareTo(res2.arrivalDate) },
-                    censored = answer != showButton
-                )
-            }
+            val reservations = if (cottageSelectionField.value != ALL_COTTAGES) {
+                reservationService.readAll().filter { it.cottage.alias == cottageSelectionField.value }
+            } else {
+                reservationService.readAll()
+            }.toSortedSet { res1, res2 -> res1.arrivalDate.compareTo(res2.arrivalDate) }
+
+            PdfExporter.exportFormattedReservations(file, reservations, censored = answer != showButton)
         }
     }
 }

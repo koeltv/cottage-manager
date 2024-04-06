@@ -1,5 +1,6 @@
 package com.koeltv.cottagemanager
 
+import com.koeltv.cottagemanager.db.ReservationView
 import com.lowagie.text.*
 import com.lowagie.text.pdf.PdfPCell
 import com.lowagie.text.pdf.PdfPTable
@@ -20,7 +21,7 @@ object PdfExporter {
 
     fun exportFormattedReservations(
         outputFile: File,
-        reservations: SortedSet<Reservation>,
+        reservations: SortedSet<ReservationView>,
         censored: Boolean = false
     ) {
         println("Exporting to $outputFile...")
@@ -59,7 +60,7 @@ object PdfExporter {
         document.close()
     }
 
-    private fun Document.addTitle(reservations: Collection<Reservation>) {
+    private fun Document.addTitle(reservations: Collection<ReservationView>) {
         val cottageAliases = reservations.map { it.cottage.alias }.distinct()
         val title = if (cottageAliases.size == 1) {
             cottageAliases.first()
@@ -75,21 +76,21 @@ object PdfExporter {
     }
 
     private fun Document.addYearSumUp(
-        reservations: Collection<Reservation>,
+        reservations: Collection<ReservationView>,
         currentYear: Int,
         censored: Boolean = false
     ) {
         val yearlyReservations = reservations.filter { it.arrivalDate.year == currentYear }
         var sumUp = "$currentYear = ${yearlyReservations.size} locations"
         if (!censored) {
-            sumUp += " = ${yearlyReservations.sumOf { it.price }.toPriceString()}"
+            sumUp += " = ${yearlyReservations.sumOf { it.price }.toUInt().toPriceString()}"
         }
         add(Paragraph(sumUp, boldFont))
     }
 
     private fun Document.addFormattedReservation(
         width: Float,
-        reservation: Reservation,
+        reservation: ReservationView,
         censored: Boolean = false
     ) {
         val table = PdfPTable(6)
@@ -108,20 +109,20 @@ object PdfExporter {
             }",
             colspan = 2
         )
-        table.addCenteredTextCell(reservation.note?.toPlusNote(), colspan = 1)
+        table.addCenteredTextCell(reservation.note?.toUByte()?.toPlusNote() ?: "", colspan = 1)
 
         var personCountString = "${reservation.adultCount} adultes"
-        if (reservation.childCount > 0u) personCountString += ", ${reservation.childCount} enfant"
-        if (reservation.babyCount > 0u) personCountString += ", ${reservation.babyCount} BB"
+        if (reservation.childCount > 0) personCountString += ", ${reservation.childCount} enfant"
+        if (reservation.babyCount > 0) personCountString += ", ${reservation.babyCount} BB"
 
         table.addCenteredTextCell(personCountString, colspan = 3)
         // Line 2
         table.addCenteredTextCell(reservation.client.name, colspan = 3)
-        table.addCenteredTextCell(reservation.confirmationCode, colspan = 3)
+        table.addCenteredTextCell(reservation.code, colspan = 3)
         // Line 3 (can be censored)
         if (!censored) {
             table.addCenteredTextCell(reservation.client.phoneNumber, colspan = 3)
-            table.addCenteredTextCell(reservation.price.toPriceString(), colspan = 3)
+            table.addCenteredTextCell(reservation.price.toUInt().toPriceString(), colspan = 3)
         }
 
         add(table)

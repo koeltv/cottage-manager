@@ -1,7 +1,7 @@
 package com.koeltv.cottagemanager
 
-import com.koeltv.cottagemanager.data.ClientView
-import com.koeltv.cottagemanager.data.toView
+import com.koeltv.cottagemanager.db.ClientService
+import com.koeltv.cottagemanager.db.ClientWithStatsView
 import javafx.fxml.FXML
 import javafx.fxml.FXMLLoader
 import javafx.fxml.Initializable
@@ -18,25 +18,26 @@ import javafx.util.Callback
 import org.controlsfx.glyphfont.FontAwesome
 import org.controlsfx.glyphfont.Glyph
 import org.jetbrains.exposed.dao.EntityChangeType
-import org.jetbrains.exposed.dao.EntityHook
-import org.jetbrains.exposed.sql.transactions.transaction
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 import java.net.URL
 import java.util.*
-import com.koeltv.cottagemanager.Client.Companion as DatabaseClient
 
-class ClientController: Initializable {
+class ClientController: Initializable, KoinComponent {
     @FXML
     lateinit var root: BorderPane
 
-    lateinit var name: TableColumn<ClientView, String>
-    lateinit var phoneNumber: TableColumn<ClientView, String?>
-    lateinit var nationality: TableColumn<ClientView, String?>
-    lateinit var averageNote: TableColumn<ClientView, String>
-    lateinit var reservationCount: TableColumn<ClientView, Int>
-    lateinit var comments: TableColumn<ClientView, String>
-    lateinit var actions: TableColumn<ClientView, Unit>
+    lateinit var name: TableColumn<ClientWithStatsView, String>
+    lateinit var phoneNumber: TableColumn<ClientWithStatsView, String?>
+    lateinit var nationality: TableColumn<ClientWithStatsView, String?>
+    lateinit var averageNote: TableColumn<ClientWithStatsView, String>
+    lateinit var reservationCount: TableColumn<ClientWithStatsView, Int>
+    lateinit var comments: TableColumn<ClientWithStatsView, String>
+    lateinit var actions: TableColumn<ClientWithStatsView, Unit>
 
-    lateinit var tableView: TableView<ClientView>
+    lateinit var tableView: TableView<ClientWithStatsView>
+
+    private val clientService : ClientService by inject()
 
     @FXML
     private fun onBackButtonClick() {
@@ -53,38 +54,31 @@ class ClientController: Initializable {
         setupActionColumn()
 
         tableView.items.clear()
-        transaction {
-            DatabaseClient.all()
-                .map { it.toView() }
-                .forEach { tableView.items.add(it) }
-        }
+        clientService.readAllWithStats().forEach { tableView.items.add(it)}
 
         tableView.sortOrder.add(name)
 
-        EntityHook.subscribe { change ->
-            if (change.entityClass == Client) {
-                when(change.changeType) {
-                    EntityChangeType.Created -> {
-                        val newView = Client.findById(change.entityId.value as String)!!.toView()
-                        tableView.items.add(newView)
-                    }
-                    EntityChangeType.Updated -> {
-                        val updatedView = Client.findById(change.entityId.value as String)!!.toView()
-                        tableView.items.removeIf { it.name == updatedView.name }
-                        tableView.items.add(updatedView)
-                    }
-                    EntityChangeType.Removed -> {
-                        tableView.items.removeIf { it.name == change.entityId.value }
-                    }
+        clientService.subscribe { id, changeType ->
+            when(changeType) {
+                EntityChangeType.Created -> {
+                    tableView.items.add(clientService.readWithStats(id))
                 }
-                tableView.sort()
+                EntityChangeType.Updated -> {
+                    val updated = clientService.readWithStats(id)!!
+                    tableView.items.removeIf { it.name == updated.name }
+                    tableView.items.add(updated)
+                }
+                EntityChangeType.Removed -> {
+                    tableView.items.removeIf { it.name == id }
+                }
             }
+            tableView.sort()
         }
     }
 
     private fun setupActionColumn() {
-        actions.cellFactory = Callback<TableColumn<ClientView, Unit?>, TableCell<ClientView, Unit?>> {
-            object : TableCell<ClientView, Unit?>() {
+        actions.cellFactory = Callback<TableColumn<ClientWithStatsView, Unit?>, TableCell<ClientWithStatsView, Unit?>> {
+            object : TableCell<ClientWithStatsView, Unit?>() {
                 private val panel = HBox(5.0).apply {
                     alignment = Pos.CENTER
                     children.add(

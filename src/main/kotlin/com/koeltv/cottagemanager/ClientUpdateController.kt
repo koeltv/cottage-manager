@@ -1,5 +1,6 @@
 package com.koeltv.cottagemanager
 
+import com.koeltv.cottagemanager.db.ClientService
 import javafx.fxml.FXML
 import javafx.fxml.Initializable
 import javafx.scene.control.Button
@@ -7,11 +8,12 @@ import javafx.scene.control.TextField
 import javafx.scene.control.TextInputControl
 import javafx.scene.layout.Pane
 import javafx.scene.layout.VBox
-import org.jetbrains.exposed.sql.transactions.transaction
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 import java.net.URL
 import java.util.*
 
-open class ClientUpdateController(private val clientId: String): Initializable {
+open class ClientUpdateController(private val clientId: String): Initializable, KoinComponent {
     @FXML
     lateinit var root: VBox
     @FXML
@@ -23,17 +25,18 @@ open class ClientUpdateController(private val clientId: String): Initializable {
     @FXML
     lateinit var addButton: Button
 
+    val clientService: ClientService by inject()
+
     override fun initialize(location: URL?, resources: ResourceBundle?) {
         nameField.isDisable = true
         addButton.isDisable = false
 
         addButton.text = "Éditer"
 
-        transaction {
-            val client = Client.findById(clientId)!!
-            nameField.text = client.name
-            nationalityField.text = client.nationality
-            phoneNumberField.text = client.phoneNumber
+        clientService.read(clientId)?.let {
+            nameField.text = it.name
+            nationalityField.text = it.nationality
+            phoneNumberField.text = it.phoneNumber
         }
 
         phoneNumberField.setOnKeyTyped { event ->
@@ -44,10 +47,9 @@ open class ClientUpdateController(private val clientId: String): Initializable {
 
     @FXML
     open fun onConfirmButtonClick() {
-        transaction {
-            val client = Client.findById(clientId)!!
-            client.phoneNumber = phoneNumberField.text
-            client.nationality = nationalityField.text
+        clientService.update(clientId) {
+            phoneNumber = phoneNumberField.text
+            nationality = nationalityField.text
         }
 
         (root.parent as Pane).children.remove(root)

@@ -2,6 +2,7 @@ package com.koeltv.cottagemanager
 
 import com.koeltv.cottagemanager.data.AirbnbReservation
 import com.koeltv.cottagemanager.data.AirbnbReservation.Status
+import com.koeltv.cottagemanager.db.ReservationService
 import javafx.event.ActionEvent
 import javafx.fxml.FXML
 import javafx.fxml.FXMLLoader
@@ -9,11 +10,15 @@ import javafx.scene.Node
 import javafx.scene.layout.StackPane
 import javafx.stage.FileChooser
 import javafx.stage.Stage
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 import java.io.File
 
-class HomeController {
+class HomeController: KoinComponent {
     @FXML
     lateinit var stackPane: StackPane
+
+    val reservationService: ReservationService by inject()
 
     @FXML
     private fun onCottageButtonClick() {
@@ -49,7 +54,7 @@ class HomeController {
         for (file in files) {
             AirbnbReservation.fromCsv(file.inputStream())
                 .filter { !Status.CANCELED.match(it.status) }
-                .forEach { DatabaseManager.importAirbnbReservation(it) }
+                .forEach { reservationService.importAirbnbReservation(it) }
         }
     }
 
