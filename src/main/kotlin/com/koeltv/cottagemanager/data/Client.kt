@@ -1,7 +1,7 @@
 package com.koeltv.cottagemanager.data
 
 data class Client(
-    val name: String,
-    val phoneNumber: String,
-    val nationality: String
-)
+    override val name: String,
+    override val phoneNumber: String,
+    override val nationality: String
+) : ClientBase(name, phoneNumber, nationality)
