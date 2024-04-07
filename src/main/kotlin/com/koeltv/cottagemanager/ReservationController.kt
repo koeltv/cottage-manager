@@ -15,7 +15,6 @@ import javafx.scene.control.*
 import javafx.scene.control.cell.PropertyValueFactory
 import javafx.scene.layout.BorderPane
 import javafx.scene.layout.HBox
-import javafx.scene.layout.Pane
 import javafx.stage.FileChooser
 import javafx.stage.Stage
 import javafx.util.Callback
@@ -31,13 +30,13 @@ import java.util.*
 import kotlin.jvm.optionals.getOrNull
 
 
-class ReservationController : Initializable, KoinComponent {
+class ReservationController : Initializable, KoinComponent, Stackable {
     companion object {
         const val ALL_COTTAGES = "Tous les gîtes"
     }
 
     @FXML
-    lateinit var root: BorderPane
+    override lateinit var root: BorderPane
 
     @FXML
     lateinit var cottageSelectionField: ChoiceBox<String>
@@ -61,15 +60,13 @@ class ReservationController : Initializable, KoinComponent {
     val clientService: ClientService by inject()
 
     @FXML
-    private fun onBackButtonClick() {
-        (root.parent as Pane).children.remove(root)
-    }
+    private fun onBackButtonClick() = unstack()
 
     @FXML
     private fun onCreationButtonClick() {
         val fxmlLoader = FXMLLoader(HelloApplication::class.java.getResource("reservation-edit-view.fxml"))
         fxmlLoader.setController(ReservationCreateController())
-        (root.parent as Pane).children.add(fxmlLoader.load())
+        stack(fxmlLoader.load())
     }
 
     override fun initialize(location: URL?, resources: ResourceBundle?) {
@@ -146,8 +143,7 @@ class ReservationController : Initializable, KoinComponent {
                                 val fxmlLoader =
                                     FXMLLoader(HelloApplication::class.java.getResource("reservation-edit-view.fxml"))
                                 fxmlLoader.setController(ReservationUpdateController(data.code))
-                                (root.parent as Pane).children.add(fxmlLoader.load())
-
+                                stack(fxmlLoader.load())
                             }
                         },
                         Button("", Glyph("FontAwesome", FontAwesome.Glyph.TRASH)).also {

@@ -13,7 +13,6 @@ import javafx.scene.control.TableView
 import javafx.scene.control.cell.PropertyValueFactory
 import javafx.scene.layout.BorderPane
 import javafx.scene.layout.HBox
-import javafx.scene.layout.Pane
 import javafx.util.Callback
 import org.controlsfx.glyphfont.FontAwesome
 import org.controlsfx.glyphfont.Glyph
@@ -23,9 +22,9 @@ import org.koin.core.component.inject
 import java.net.URL
 import java.util.*
 
-class ClientController: Initializable, KoinComponent {
+class ClientController: Initializable, KoinComponent, Stackable {
     @FXML
-    lateinit var root: BorderPane
+    override lateinit var root: BorderPane
 
     lateinit var name: TableColumn<ClientWithStats, String>
     lateinit var phoneNumber: TableColumn<ClientWithStats, String?>
@@ -40,9 +39,7 @@ class ClientController: Initializable, KoinComponent {
     private val clientService : ClientService by inject()
 
     @FXML
-    private fun onBackButtonClick() {
-        (root.parent as Pane).children.remove(root)
-    }
+    private fun onBackButtonClick() = unstack()
 
     override fun initialize(location: URL?, resources: ResourceBundle?) {
         name.cellValueFactory = PropertyValueFactory("name")
@@ -90,7 +87,7 @@ class ClientController: Initializable, KoinComponent {
                                 val fxmlLoader =
                                     FXMLLoader(HelloApplication::class.java.getResource("client-edit-view.fxml"))
                                 fxmlLoader.setController(ClientUpdateController(data.name))
-                                (root.parent as Pane).children.add(fxmlLoader.load())
+                                stack(fxmlLoader.load())
                             }
                         }
                     )

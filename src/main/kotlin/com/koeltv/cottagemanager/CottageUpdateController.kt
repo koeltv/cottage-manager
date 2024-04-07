@@ -1,7 +1,6 @@
 package com.koeltv.cottagemanager
 
 import javafx.fxml.FXML
-import javafx.scene.layout.Pane
 import java.net.URL
 import java.util.*
 
@@ -25,6 +24,6 @@ class CottageUpdateController(private val cottageId: String) : CottageCreateCont
             alias = aliasField.text.ifBlank { nameField.text }
         }
 
-        (root.parent as Pane).children.remove(root)
+        unstack()
     }
 }

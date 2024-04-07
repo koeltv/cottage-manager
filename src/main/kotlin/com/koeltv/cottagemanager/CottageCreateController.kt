@@ -6,16 +6,15 @@ import javafx.fxml.FXML
 import javafx.fxml.Initializable
 import javafx.scene.control.Button
 import javafx.scene.control.TextField
-import javafx.scene.layout.Pane
 import javafx.scene.layout.VBox
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import java.net.URL
 import java.util.*
 
-open class CottageCreateController: Initializable, KoinComponent {
+open class CottageCreateController: Initializable, KoinComponent, Stackable {
     @FXML
-    lateinit var root: VBox
+    override lateinit var root: VBox
     @FXML
     lateinit var nameField: TextField
     @FXML
@@ -38,11 +37,9 @@ open class CottageCreateController: Initializable, KoinComponent {
             alias = aliasField.text.ifBlank { nameField.text }
         ))
 
-        (root.parent as Pane).children.remove(root)
+        unstack()
     }
 
     @FXML
-    fun onCancelButtonClick() {
-        (root.parent as Pane).children.remove(root)
-    }
+    fun onCancelButtonClick() = unstack()
 }

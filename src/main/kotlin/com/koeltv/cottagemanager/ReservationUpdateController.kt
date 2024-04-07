@@ -2,7 +2,6 @@ package com.koeltv.cottagemanager
 
 import com.koeltv.cottagemanager.data.Client
 import javafx.fxml.FXML
-import javafx.scene.layout.Pane
 import java.net.URL
 import java.time.LocalDate
 import java.util.*
@@ -75,6 +74,6 @@ class ReservationUpdateController(private val reservationId: String) : Reservati
             comments = commentsArea.text
         }
 
-        (root.parent as Pane).children.remove(root)
+        unstack()
     }
 }

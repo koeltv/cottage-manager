@@ -12,7 +12,6 @@ import javafx.event.Event
 import javafx.fxml.FXML
 import javafx.fxml.Initializable
 import javafx.scene.control.*
-import javafx.scene.layout.Pane
 import javafx.scene.layout.VBox
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
@@ -21,9 +20,9 @@ import java.time.LocalDate
 import java.util.*
 
 
-open class ReservationCreateController : Initializable, KoinComponent {
+open class ReservationCreateController : Initializable, KoinComponent, Stackable {
     @FXML
-    lateinit var root: VBox
+    override lateinit var root: VBox
 
     @FXML
     lateinit var cottageField: ChoiceBox<String>
@@ -170,9 +169,7 @@ open class ReservationCreateController : Initializable, KoinComponent {
     }
 
     @FXML
-    fun onCancelButtonClick() {
-        (root.parent as Pane).children.remove(root)
-    }
+    fun onCancelButtonClick() = unstack()
 
     @FXML
     open fun onConfirmButtonClick() {
@@ -181,7 +178,7 @@ open class ReservationCreateController : Initializable, KoinComponent {
             name = nameField.text,
             phoneNumber = phoneNumberField.text,
             nationality = nationalityField.text
-        )
+            )
         )
 
         reservationService.create(
@@ -205,9 +202,9 @@ open class ReservationCreateController : Initializable, KoinComponent {
             },
             note = noteField.value.toNote().toInt(),
             comments = commentsArea.text
-        )
+            )
         )
 
-        (root.parent as Pane).children.remove(root)
+        unstack()
     }
 }

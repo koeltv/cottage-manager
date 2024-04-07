@@ -13,7 +13,6 @@ import javafx.scene.control.TableView
 import javafx.scene.control.cell.PropertyValueFactory
 import javafx.scene.layout.BorderPane
 import javafx.scene.layout.HBox
-import javafx.scene.layout.Pane
 import javafx.util.Callback
 import org.controlsfx.glyphfont.FontAwesome
 import org.controlsfx.glyphfont.Glyph
@@ -24,9 +23,9 @@ import java.net.URL
 import java.util.*
 
 
-class CottageController : Initializable, KoinComponent {
+class CottageController : Initializable, KoinComponent, Stackable {
     @FXML
-    lateinit var root: BorderPane
+    override lateinit var root: BorderPane
 
     lateinit var name: TableColumn<Cottage, String>
     lateinit var alias: TableColumn<Cottage, String>
@@ -38,9 +37,7 @@ class CottageController : Initializable, KoinComponent {
     private val cottageService: CottageService by inject()
 
     @FXML
-    private fun onBackButtonClick() {
-        (root.parent as Pane).children.remove(root)
-    }
+    private fun onBackButtonClick() = unstack()
 
     override fun initialize(location: URL?, resources: ResourceBundle?) {
         name.cellValueFactory = PropertyValueFactory("name")
@@ -84,7 +81,7 @@ class CottageController : Initializable, KoinComponent {
                                 val fxmlLoader =
                                     FXMLLoader(HelloApplication::class.java.getResource("cottage-edit-view.fxml"))
                                 fxmlLoader.setController(CottageUpdateController(data.name))
-                                (root.parent as Pane).children.add(fxmlLoader.load())
+                                stack(fxmlLoader.load())
                             }
                         }
                     )
@@ -103,6 +100,6 @@ class CottageController : Initializable, KoinComponent {
         val fxmlLoader =
             FXMLLoader(HelloApplication::class.java.getResource("cottage-edit-view.fxml"))
         fxmlLoader.setController(CottageCreateController())
-        (root.parent as Pane).children.add(fxmlLoader.load())
+        stack(fxmlLoader.load())
     }
 }
