@@ -1,6 +1,8 @@
-package com.koeltv.cottagemanager
+package com.koeltv.cottagemanager.controller
 
 import com.koeltv.cottagemanager.data.Client
+import com.koeltv.cottagemanager.toNote
+import com.koeltv.cottagemanager.toPlusNote
 import javafx.fxml.FXML
 import java.net.URL
 import java.time.LocalDate

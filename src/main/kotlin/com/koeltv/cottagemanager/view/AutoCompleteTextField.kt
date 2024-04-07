@@ -1,4 +1,4 @@
-package com.koeltv.cottagemanager
+package com.koeltv.cottagemanager.view
 
 import javafx.beans.property.ObjectProperty
 import javafx.beans.property.SimpleObjectProperty

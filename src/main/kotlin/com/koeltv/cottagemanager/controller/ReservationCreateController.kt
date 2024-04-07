@@ -1,10 +1,12 @@
-package com.koeltv.cottagemanager
+package com.koeltv.cottagemanager.controller
 
 import com.koeltv.cottagemanager.data.Client
 import com.koeltv.cottagemanager.data.Reservation
 import com.koeltv.cottagemanager.db.ClientService
 import com.koeltv.cottagemanager.db.CottageService
 import com.koeltv.cottagemanager.db.ReservationService
+import com.koeltv.cottagemanager.toNote
+import com.koeltv.cottagemanager.view.AutoCompleteTextField
 import javafx.collections.FXCollections
 import javafx.collections.MapChangeListener
 import javafx.collections.ObservableMap

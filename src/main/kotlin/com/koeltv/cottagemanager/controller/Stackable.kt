@@ -1,4 +1,4 @@
-package com.koeltv.cottagemanager
+package com.koeltv.cottagemanager.controller
 
 import javafx.scene.Node
 import javafx.scene.layout.Pane

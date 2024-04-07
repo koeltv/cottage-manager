@@ -1,6 +1,9 @@
-package com.koeltv.cottagemanager
+package com.koeltv.cottagemanager.io
 
 import com.koeltv.cottagemanager.data.Reservation
+import com.koeltv.cottagemanager.toPlusNote
+import com.koeltv.cottagemanager.toPriceString
+import com.koeltv.cottagemanager.uppercaseFirst
 import com.lowagie.text.*
 import com.lowagie.text.pdf.PdfPCell
 import com.lowagie.text.pdf.PdfPTable

@@ -1,5 +1,6 @@
-package com.koeltv.cottagemanager
+package com.koeltv.cottagemanager.controller
 
+import com.koeltv.cottagemanager.HelloApplication
 import com.koeltv.cottagemanager.data.AirbnbReservation
 import com.koeltv.cottagemanager.data.AirbnbReservation.Status
 import com.koeltv.cottagemanager.db.ReservationService

@@ -1,4 +1,4 @@
-package com.koeltv.cottagemanager
+package com.koeltv.cottagemanager.controller
 
 import com.koeltv.cottagemanager.data.Cottage
 import com.koeltv.cottagemanager.db.CottageService

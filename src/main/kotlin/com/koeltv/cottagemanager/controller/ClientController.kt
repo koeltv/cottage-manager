@@ -1,7 +1,9 @@
-package com.koeltv.cottagemanager
+package com.koeltv.cottagemanager.controller
 
+import com.koeltv.cottagemanager.HelloApplication
 import com.koeltv.cottagemanager.data.ClientWithStats
 import com.koeltv.cottagemanager.db.ClientService
+import com.koeltv.cottagemanager.toPlusNote
 import javafx.beans.property.SimpleStringProperty
 import javafx.fxml.FXML
 import javafx.fxml.FXMLLoader
@@ -62,7 +64,7 @@ class ClientController : Initializable, KoinComponent, Stackable {
         nationality.cellValueFactory = PropertyValueFactory("nationality")
         averageNote.setCellValueFactory { SimpleStringProperty(it.value.averageNote?.toUByte()?.toPlusNote() ?: "") }
         reservationCount.cellValueFactory = PropertyValueFactory("reservationCount")
-        comments.cellValueFactory = PropertyValueFactory("comments")
+//        comments.cellValueFactory = PropertyValueFactory("comments")
         setupActionColumn()
 
         tableView.items.clear()

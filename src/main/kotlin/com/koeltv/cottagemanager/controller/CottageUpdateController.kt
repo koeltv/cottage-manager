@@ -1,4 +1,4 @@
-package com.koeltv.cottagemanager
+package com.koeltv.cottagemanager.controller
 
 import javafx.fxml.FXML
 import java.net.URL
