@@ -9,7 +9,6 @@ import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.dao.id.IdTable
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.SchemaUtils
-import org.jetbrains.exposed.sql.insertIgnore
 import org.jetbrains.exposed.sql.javatime.date
 import org.jetbrains.exposed.sql.transactions.transaction
 import com.koeltv.cottagemanager.data.Reservation as DataReservation
@@ -125,31 +124,36 @@ class ReservationService(private val database: Database) {
         }
     }
 
-    fun importAirbnbReservation(reservation: AirbnbReservation) = transaction {
-        CottageService.Cottages.insertIgnore {
-            it[name] = reservation.cottage
-            it[alias] = reservation.cottage
-        }
-        ClientService.Client.findById(reservation.name)?.let {
+    fun importAirbnbReservation(reservation: AirbnbReservation) = transaction(database) {
+        val reservationCottage =
+            CottageService.Cottage.findById(reservation.cottage)
+                ?: CottageService.Cottage.new(reservation.cottage) {
+                    alias = reservation.cottage
+                }
+
+        val reservationClient = ClientService.Client.findByIdAndUpdate(reservation.name) {
             if (reservation.phoneNumber.isNotBlank()) {
                 it.phoneNumber = reservation.phoneNumber
             }
         } ?: ClientService.Client.new(reservation.name) {
             phoneNumber = reservation.phoneNumber
         }
-        Reservations.insertIgnore {
-            it[confirmationCode] = reservation.confirmationCode
-            it[status] = reservation.status
-            it[client] = ClientService.Clients.select(ClientService.Clients.name).where { ClientService.Clients.name eq reservation.name }
-            it[adultCount] = reservation.adultCount.toUByte()
-            it[childCount] = reservation.childCount.toUByte()
-            it[babyCount] = reservation.babyCount.toUByte()
-            it[arrivalDate] = reservation.arrivalDate
-            it[departureDate] = reservation.departureDate
-            it[nightCount] = reservation.nightCount.toUShort()
-            it[reservationDate] = reservation.reservationDate
-            it[cottage] = CottageService.Cottages.select(CottageService.Cottages.name).where { CottageService.Cottages.name eq reservation.cottage }
-            it[price] = reservation.price.toUInt()
+
+        val reservationUpdater: Reservation.() -> Unit = {
+            status = reservation.status
+            client = reservationClient
+            adultCount = reservation.adultCount.toUByte()
+            childCount = reservation.childCount.toUByte()
+            babyCount = reservation.babyCount.toUByte()
+            arrivalDate = reservation.arrivalDate
+            departureDate = reservation.departureDate
+            nightCount = reservation.nightCount.toUShort()
+            reservationDate = reservation.reservationDate
+            cottage = reservationCottage
+            price = reservation.price.toUInt()
         }
+
+        Reservation.findByIdAndUpdate(reservation.confirmationCode, reservationUpdater)
+            ?: Reservation.new(reservation.confirmationCode, reservationUpdater)
     }
 }

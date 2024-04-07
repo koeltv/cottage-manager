@@ -41,15 +41,34 @@ class ReservationController : Initializable, KoinComponent, Stackable {
     @FXML
     lateinit var cottageSelectionField: ChoiceBox<String>
 
+    @FXML
     lateinit var arrivalDate: TableColumn<Reservation, LocalDate>
+
+    @FXML
     lateinit var departureDate: TableColumn<Reservation, LocalDate>
+
+    @FXML
     lateinit var client: TableColumn<Reservation, String>
+
+    @FXML
     lateinit var repartition: TableColumn<Reservation, String>
+
+    @FXML
     lateinit var nationality: TableColumn<Reservation, String>
+
+    @FXML
     lateinit var price: TableColumn<Reservation, String>
+
+    @FXML
     lateinit var note: TableColumn<Reservation, String>
+
+    @FXML
     lateinit var code: TableColumn<Reservation, String>
+
+    @FXML
     lateinit var comments: TableColumn<Reservation, String>
+
+    @FXML
     lateinit var actions: TableColumn<Reservation, Unit>
 
     @FXML

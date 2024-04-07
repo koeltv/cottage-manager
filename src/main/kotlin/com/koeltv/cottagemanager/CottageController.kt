@@ -27,8 +27,13 @@ class CottageController : Initializable, KoinComponent, Stackable {
     @FXML
     override lateinit var root: BorderPane
 
+    @FXML
     lateinit var name: TableColumn<Cottage, String>
+
+    @FXML
     lateinit var alias: TableColumn<Cottage, String>
+
+    @FXML
     lateinit var actions: TableColumn<Cottage, Unit>
 
     @FXML

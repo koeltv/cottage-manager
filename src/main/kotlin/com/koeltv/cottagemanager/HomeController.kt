@@ -14,7 +14,7 @@ import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import java.io.File
 
-class HomeController: KoinComponent {
+class HomeController : KoinComponent {
     @FXML
     lateinit var stackPane: StackPane
 

@@ -175,33 +175,33 @@ open class ReservationCreateController : Initializable, KoinComponent, Stackable
     open fun onConfirmButtonClick() {
         val client = clientService.read(nameField.text) ?: clientService.create(
             Client(
-            name = nameField.text,
-            phoneNumber = phoneNumberField.text,
-            nationality = nationalityField.text
+                name = nameField.text,
+                phoneNumber = phoneNumberField.text,
+                nationality = nationalityField.text
             )
         )
 
         reservationService.create(
             Reservation(
-            code = confirmationCodeField.text,
-            //status
-            client = client,
-            adultCount = adultCountField.text.toInt(),
-            childCount = childCountField.text.toIntOrNull() ?: 0,
-            babyCount = babyCountField.text.toIntOrNull() ?: 0,
-            arrivalDate = arrivalDateField.value,
-            departureDate = departureDateField.value,
-            //nightCount
-            reservationDate = LocalDate.now(),
-            cottage = cottageService.readAll().first { it.alias == cottageField.value },
-            price = priceField.text.let {
-                Regex("(\\d+)([,.](\\d{0,2}))?")
-                    .find(it)!!.destructured
-                    .let { (euros, _, cents) -> "$euros${cents.padEnd(2, '0')}" }
-                    .toInt()
-            },
-            note = noteField.value.toNote().toInt(),
-            comments = commentsArea.text
+                code = confirmationCodeField.text,
+                //status
+                client = client,
+                adultCount = adultCountField.text.toInt(),
+                childCount = childCountField.text.toIntOrNull() ?: 0,
+                babyCount = babyCountField.text.toIntOrNull() ?: 0,
+                arrivalDate = arrivalDateField.value,
+                departureDate = departureDateField.value,
+                //nightCount
+                reservationDate = LocalDate.now(),
+                cottage = cottageService.readAll().first { it.alias == cottageField.value },
+                price = priceField.text.let {
+                    Regex("(\\d+)([,.](\\d{0,2}))?")
+                        .find(it)!!.destructured
+                        .let { (euros, _, cents) -> "$euros${cents.padEnd(2, '0')}" }
+                        .toInt()
+                },
+                note = noteField.value.toNote().toInt(),
+                comments = commentsArea.text
             )
         )
 

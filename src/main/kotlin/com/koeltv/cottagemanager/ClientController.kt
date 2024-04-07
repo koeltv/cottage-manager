@@ -2,6 +2,7 @@ package com.koeltv.cottagemanager
 
 import com.koeltv.cottagemanager.data.ClientWithStats
 import com.koeltv.cottagemanager.db.ClientService
+import javafx.beans.property.SimpleStringProperty
 import javafx.fxml.FXML
 import javafx.fxml.FXMLLoader
 import javafx.fxml.Initializable
@@ -22,21 +23,35 @@ import org.koin.core.component.inject
 import java.net.URL
 import java.util.*
 
-class ClientController: Initializable, KoinComponent, Stackable {
+class ClientController : Initializable, KoinComponent, Stackable {
     @FXML
     override lateinit var root: BorderPane
 
+    @FXML
     lateinit var name: TableColumn<ClientWithStats, String>
+
+    @FXML
     lateinit var phoneNumber: TableColumn<ClientWithStats, String?>
+
+    @FXML
     lateinit var nationality: TableColumn<ClientWithStats, String?>
+
+    @FXML
     lateinit var averageNote: TableColumn<ClientWithStats, String>
+
+    @FXML
     lateinit var reservationCount: TableColumn<ClientWithStats, Int>
+
+    @FXML
     lateinit var comments: TableColumn<ClientWithStats, String>
+
+    @FXML
     lateinit var actions: TableColumn<ClientWithStats, Unit>
 
+    @FXML
     lateinit var tableView: TableView<ClientWithStats>
 
-    private val clientService : ClientService by inject()
+    private val clientService: ClientService by inject()
 
     @FXML
     private fun onBackButtonClick() = unstack()
@@ -45,18 +60,18 @@ class ClientController: Initializable, KoinComponent, Stackable {
         name.cellValueFactory = PropertyValueFactory("name")
         phoneNumber.cellValueFactory = PropertyValueFactory("phoneNumber")
         nationality.cellValueFactory = PropertyValueFactory("nationality")
-        averageNote.cellValueFactory = PropertyValueFactory("averageNote")
+        averageNote.setCellValueFactory { SimpleStringProperty(it.value.averageNote?.toUByte()?.toPlusNote() ?: "") }
         reservationCount.cellValueFactory = PropertyValueFactory("reservationCount")
         comments.cellValueFactory = PropertyValueFactory("comments")
         setupActionColumn()
 
         tableView.items.clear()
-        clientService.readAllWithStats().forEach { tableView.items.add(it)}
+        clientService.readAllWithStats().forEach { tableView.items.add(it) }
 
         tableView.sortOrder.add(name)
 
         clientService.subscribe { id, changeType ->
-            when(changeType) {
+            when (changeType) {
                 EntityChangeType.Created -> {
                     tableView.items.add(clientService.readWithStats(id))
                 }

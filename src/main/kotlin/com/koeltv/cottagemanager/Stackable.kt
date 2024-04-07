@@ -34,5 +34,5 @@ interface Stackable {
      *
      * @param element The Node to be added to the stack.
      */
-    fun <T: Node> stack(element: T) = (root.parent as Pane).children.add(element)
+    fun <T : Node> stack(element: T) = (root.parent as Pane).children.add(element)
 }

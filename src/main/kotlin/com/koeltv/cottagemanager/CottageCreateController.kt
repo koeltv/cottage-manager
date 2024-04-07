@@ -12,13 +12,16 @@ import org.koin.core.component.inject
 import java.net.URL
 import java.util.*
 
-open class CottageCreateController: Initializable, KoinComponent, Stackable {
+open class CottageCreateController : Initializable, KoinComponent, Stackable {
     @FXML
     override lateinit var root: VBox
+
     @FXML
     lateinit var nameField: TextField
+
     @FXML
     lateinit var aliasField: TextField
+
     @FXML
     lateinit var addButton: Button
 

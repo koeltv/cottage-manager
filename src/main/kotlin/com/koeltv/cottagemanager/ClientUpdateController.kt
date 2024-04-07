@@ -12,15 +12,19 @@ import org.koin.core.component.inject
 import java.net.URL
 import java.util.*
 
-open class ClientUpdateController(private val clientId: String): Initializable, KoinComponent, Stackable {
+open class ClientUpdateController(private val clientId: String) : Initializable, KoinComponent, Stackable {
     @FXML
     override lateinit var root: VBox
+
     @FXML
     lateinit var nameField: TextField
+
     @FXML
     lateinit var nationalityField: TextField
+
     @FXML
     lateinit var phoneNumberField: TextField
+
     @FXML
     lateinit var addButton: Button
 
